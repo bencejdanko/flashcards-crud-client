@@ -1,6 +1,6 @@
 import PocketBase from "pocketbase";
 
-export const pb = new PocketBase("https://pb.32kb.dev");
+export const pb = new PocketBase("http://192.168.0.14:8090/");
 
 import { writable } from "svelte/store";
 
