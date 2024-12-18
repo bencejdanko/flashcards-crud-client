@@ -5,7 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Copy, Delete, Download, Edit, PlayIcon } from "lucide-react";
+import { Copy, Delete, Download, Edit, PlayIcon, Trash } from "lucide-react";
 import { DashboardMenu } from "@/components";
 
 import {
@@ -15,12 +15,24 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { Link } from "react-router-dom";
 
 import { usePocket } from "@/contexts/pb";
 
 function Dashboard() {
-    const { user, decks } = usePocket();
+    const { user, decks, deleteDeck } = usePocket();
 
     return (
         <div>
@@ -55,9 +67,9 @@ function Dashboard() {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Link to={`/editor/${deck.id}`}>
-                                        <PlayIcon
-                                            size={15}
-                                        />
+                                            <PlayIcon
+                                                size={15}
+                                            />
                                         </Link>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -91,6 +103,36 @@ function Dashboard() {
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
+
+
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Trash
+                                        size={15}
+                                    />
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            Are you absolutely sure?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            <p>This action cannot be undone. You are permanently deleting deck <strong>{deck.name}</strong>.</p>
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction 
+                                            className="bg-red-500"
+                                            onClick={() => deleteDeck(deck.id)}
+                                        >
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </CardFooter>
                     </Card>
                 ))}

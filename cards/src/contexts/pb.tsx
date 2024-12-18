@@ -22,6 +22,7 @@ interface PocketContextType {
     createDeck: (name: string) => Promise<RecordModel>;
     getDeckModel: (deckId: string) => Promise<RecordModel>;
     setDeckModel: (deckId: string, model: RecordModel) => Promise<RecordModel>;
+    deleteDeck: (deckId: string) => void;
 
     decks: RecordModel[];
 }
@@ -81,7 +82,7 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
             name,
             user: user.id,
         });
-        //fetchDecks();
+        fetchDecks();
         return result;
     };
 
@@ -99,6 +100,17 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
         return result;
     };
 
+    const deleteDeck = async (deckId: string): Promise<boolean> => {
+        try {
+            await pb.collection("decks").delete(deckId);
+            await fetchDecks();
+            return true;
+        } catch (error) {
+            console.error("Deck not found", error);
+            return false;
+        }
+    }
+
     return (
         <PocketContext.Provider
             value={{
@@ -112,6 +124,7 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
                 createDeck,
                 getDeckModel,
                 setDeckModel,
+                deleteDeck,
             }}
         >
             {children}

@@ -6,10 +6,14 @@ import { useParams } from "react-router-dom";
 
 import YAML from "yaml";
 
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
 function Editor() {
-    const [editorWidth, setEditorWidth] = useState(500); // Initial width for editor container
-    const [editorHeight, setEditorHeight] = useState(0);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const [editorHeight] = useState(0);
     const editorValue = useRef<string>("");
     const [parsedYAML, setParsedYAML] = useState([{}]);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -19,71 +23,12 @@ function Editor() {
     const { getDeckModel, setDeckModel } = usePocket();
 
     useEffect(() => {
-        const updateDimensions = () => {
-            if (containerRef.current) {
-                const editor = containerRef.current.querySelector(".editor");
-                const editorHeight = editor
-                    ? parseFloat(getComputedStyle(editor).height)
-                    : 0;
-                setEditorHeight(editorHeight);
-            }
-        };
-
-        updateDimensions();
-        window.addEventListener("resize", updateDimensions);
-
-        return () => {
-            window.removeEventListener("resize", updateDimensions);
-        };
-    });
-
-    useEffect(() => {
-        const handle = document.querySelector(".resize-handle");
-        const editor = document.querySelector(".editor");
-
-        if (!handle || !editor) return;
-
-        let isResizing = false;
-
-        const onMouseMove = (e: any) => {
-            if (!isResizing) return;
-            const containerLeft =
-                containerRef.current!.getBoundingClientRect().left;
-            const newWidth = e.clientX - containerLeft;
-
-            // Set limits to the resize
-            if (newWidth >= 200 && newWidth <= 800) {
-                setEditorWidth(newWidth);
-            }
-        };
-
-        const onMouseUp = () => {
-            isResizing = false;
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
-        };
-
-        handle.addEventListener("mousedown", () => {
-            isResizing = true;
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", onMouseUp);
-        });
-
-        return () => {
-            handle.removeEventListener("mousedown", onMouseMove);
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
-        };
-    }, []);
-
-    useEffect(() => {
         /**
          * Set a timer that will periodically check if the document has changed, and if true,
          * save the document to the database.
          */
         async function handleSync() {
             console.log("starting sync process for editor");
-
 
             if (!id) {
                 console.error("No deck id provided");
@@ -94,13 +39,11 @@ function Editor() {
             getDeckModel(id).then((model) => {
                 editorValue.current = model.document;
                 handleChange(editorValue.current);
-            })
+            });
 
             intervalRef.current = setInterval(() => {
-
                 getDeckModel(id!).then((model) => {
                     let currentDocument = model.document;
-                    
 
                     if (currentDocument === editorValue.current) {
                         console.log("document has not changed");
@@ -220,39 +163,44 @@ function Editor() {
     };
 
     return (
-        <div ref={containerRef} className="flex flex-col w-full h-full">
+        <div className="flex flex-col w-full h-full overflow-auto">
             <EditorMenu />
-            <div className="flex flex-row grow">
-                <div
-                    className="editor relative m-2 shadow shadow-lg"
-                    style={{ width: `${editorWidth}px` }} // Set width dynamically
-                >
-                    <TextEditor
-                        value={editorValue.current}
-                        height={`${editorHeight}px`}
-                        onChange={handleChange}
-                    />
-                    <div className="resize-handle absolute -right-4 top-0 h-full w-4 cursor-ew-resize flex justify-center items-center">
-                        <GripVertical />
+            <ResizablePanelGroup
+                direction="horizontal"
+                className="overflow-auto h-[750px]"
+            >
+                <ResizablePanel>
+                    <div className="editor relative m-2 shadow shadow-lg">
+                        <TextEditor
+                            value={editorValue.current}
+                            onChange={handleChange}
+                        />
                     </div>
-                </div>
-                <div className="flex-grow flex justify-center">
-                    <div
-                        style={{ height: `${editorHeight}px` }}
-                        className="max-w-[600px] flex flex-wrap overflow-auto"
-                    >
-                        {parsedYAML.flashcards &&
-                                Array.isArray(parsedYAML.flashcards) &&
-                                parsedYAML.flashcards.map((card: Card) => (
-                                    <Flashcard key={card.id} card={card} />
-                                )) || (
-                            <div>
-                                not an array: {JSON.stringify(parsedYAML)}
-                            </div>
-                        )}
+                </ResizablePanel>
+                <ResizableHandle withHandle />
+
+                <ResizablePanel>
+                    <div className="flex justify-center">
+                        <div className="max-w-[600px] flex flex-wrap overflow-auto">
+                            {parsedYAML && parsedYAML.flashcards &&
+                                    Array.isArray(parsedYAML.flashcards) &&
+                                    parsedYAML.flashcards.map((card: Card) => (
+                                        <Flashcard key={card.id} card={card} />
+                                    )) || (
+                                <div>
+                                    not an array: {JSON.stringify(parsedYAML)}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </div>
+                </ResizablePanel>
+                <ResizableHandle withHandle />
+                <ResizablePanel>
+                    <div className="flex-grow flex justify-center">
+                        Chatbot here
+                    </div>
+                </ResizablePanel>
+            </ResizablePanelGroup>
         </div>
     );
 }

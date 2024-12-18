@@ -3,12 +3,12 @@ import CodeMirror from "@uiw/react-codemirror";
 import { yaml } from "@codemirror/lang-yaml";
 
 interface EditorProps {
-  height: string;
+  //height: string;
   value: string;
   onChange: (value: string) => void;
 }
 
-export function TextEditor({ height, value, onChange }: EditorProps) {
+export function TextEditor({ value, onChange }: EditorProps) {
   const handleChange = React.useCallback((val: any, viewUpdate: any) => {
     onChange(val);
   }, [onChange]);
@@ -16,7 +16,7 @@ export function TextEditor({ height, value, onChange }: EditorProps) {
   return (
     <CodeMirror
       value={value}
-      height={height}
+      //height={height}
       extensions={[yaml()]}
       onChange={handleChange}
     />
