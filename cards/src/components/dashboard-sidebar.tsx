@@ -25,7 +25,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function DashboardSidebar() {
-    const { user, decks } = usePocket();
+    const { user, decks, createDeck } = usePocket();
+
+    const handleCreateDeck = async () => {
+        console.log("creating deck")
+        const deck = await createDeck("new deck");
+        console.log(deck);
+    }
 
     return (
         <div>
@@ -37,7 +43,7 @@ export function DashboardSidebar() {
                 <SidebarContent>
                     <SidebarGroup>
                         <SidebarGroupLabel>Create a deck</SidebarGroupLabel>
-                        <SidebarGroupAction>
+                        <SidebarGroupAction onClick={handleCreateDeck}>
                             <Plus />{" "}
                             <span className="sr-only">Add Project</span>
                         </SidebarGroupAction>

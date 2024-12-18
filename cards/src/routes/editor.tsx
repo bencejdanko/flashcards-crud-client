@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { usePocket } from "@/contexts/pb";
 import { EditorMenu, TextEditor } from "@/components";
 import { GripVertical } from "lucide-react";
@@ -11,10 +10,13 @@ function Editor() {
     const [editorWidth, setEditorWidth] = useState(500); // Initial width for editor container
     const [editorHeight, setEditorHeight] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
-    const [editorValue, setEditorValue] = useState("---\nkey: value\n");
+    const editorValue = useRef<string>("");
     const [parsedYAML, setParsedYAML] = useState([{}]);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const { id } = useParams();
+
+    const { getDeckModel, setDeckModel } = usePocket();
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -74,12 +76,79 @@ function Editor() {
         };
     }, []);
 
+    useEffect(() => {
+        /**
+         * Set a timer that will periodically check if the document has changed, and if true,
+         * save the document to the database.
+         */
+        async function handleSync() {
+            console.log("starting sync process for editor");
+
+
+            if (!id) {
+                console.error("No deck id provided");
+                return;
+            }
+
+            // get initial doc
+            getDeckModel(id).then((model) => {
+                editorValue.current = model.document;
+                handleChange(editorValue.current);
+            })
+
+            intervalRef.current = setInterval(() => {
+
+                getDeckModel(id!).then((model) => {
+                    let currentDocument = model.document;
+                    
+
+                    if (currentDocument === editorValue.current) {
+                        console.log("document has not changed");
+                        return;
+                    }
+
+                    currentDocument = editorValue;
+                    console.log("Saving document...");
+
+                    const modifed_model = model;
+                    modifed_model.document = editorValue.current;
+                    setDeckModel(id, model).then((result) => {
+                        console.log("Document saved");
+                    }).catch((error) => {
+                        console.error("Failed to save document", error);
+                    });
+                });
+            }, 5000);
+        }
+
+        handleSync();
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, []);
+
+    //handleSync();
+
     interface Card {
         id?: string;
         question?: string;
         answer?: string;
-        error? : string;
+        error?: string;
     }
+
+    const handleChange = (value: string) => {
+        editorValue.current = value;
+
+        try {
+            const parsed = YAML.parse(editorValue.current);
+            setParsedYAML(parsed);
+        } catch (error) {
+            setParsedYAML([{ error: `Failed to parse YAML: ${error}` }]);
+        }
+    };
 
     const Flashcard: React.FC<{ card: Card }> = ({ card }) => {
         const [flipped, setFlipped] = useState(false);
@@ -150,15 +219,6 @@ function Editor() {
         );
     };
 
-    useEffect(() => {
-        try {
-            const parsed = YAML.parse(editorValue);
-            setParsedYAML(parsed);
-        } catch (error) {
-            setParsedYAML([{ error: `Failed to parse YAML: ${error}` }]);
-        }
-    }, [editorValue]);
-
     return (
         <div ref={containerRef} className="flex flex-col w-full h-full">
             <EditorMenu />
@@ -168,22 +228,28 @@ function Editor() {
                     style={{ width: `${editorWidth}px` }} // Set width dynamically
                 >
                     <TextEditor
-                        value={editorValue}
+                        value={editorValue.current}
                         height={`${editorHeight}px`}
-                        onChange={setEditorValue}
+                        onChange={handleChange}
                     />
                     <div className="resize-handle absolute -right-4 top-0 h-full w-4 cursor-ew-resize flex justify-center items-center">
                         <GripVertical />
                     </div>
                 </div>
                 <div className="flex-grow flex justify-center">
-                    <div 
-                        style = {{ height: `${editorHeight}px` }}
-                        className="max-w-[600px] flex flex-wrap overflow-auto">
-                        {parsedYAML.flashcards && Array.isArray(parsedYAML.flashcards) &&
-                            parsedYAML.flashcards.map((card: Card) => (
-                                <Flashcard key={card.id} card={card} />
-                            )) || <div>not an array: {JSON.stringify(parsedYAML)}</div>}
+                    <div
+                        style={{ height: `${editorHeight}px` }}
+                        className="max-w-[600px] flex flex-wrap overflow-auto"
+                    >
+                        {parsedYAML.flashcards &&
+                                Array.isArray(parsedYAML.flashcards) &&
+                                parsedYAML.flashcards.map((card: Card) => (
+                                    <Flashcard key={card.id} card={card} />
+                                )) || (
+                            <div>
+                                not an array: {JSON.stringify(parsedYAML)}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

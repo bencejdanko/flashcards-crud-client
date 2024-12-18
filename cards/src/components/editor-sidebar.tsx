@@ -26,23 +26,73 @@ import {
 
 import { useParams } from "react-router-dom";
 
+import { useRef, useEffect } from "react";
+
 export function EditorSidebar() {
-    const { user, decks } = usePocket();
 
+    const { user, decks, setDeckModel, getDeckModel } = usePocket();
     const { id } = useParams();
-
     const currentDeck = decks.find((deck) => deck.id === id);
+    const nameValue = useRef<string>("");
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+
+    const handleChange = (value: string) => {
+        console.log("Setting name to", value);
+        nameValue.current = value;
+    };
+
+    useEffect(() => {
+        console.log("Starting syncing process for deck name")
+
+        if (!id) {
+            console.error("No deck id provided");
+            return;
+        }
+
+        // get initial name
+        getDeckModel(id).then((model) => {
+            nameValue.current = model.name;
+            handleChange(nameValue.current);
+        })
+
+        intervalRef.current = setInterval(() => {
+            getDeckModel(id!).then((model) => {
+                let currentName = model.name;
+                
+
+                if (currentName === nameValue.current) {
+                    console.log("name has not changed");
+                    return;
+                }
+
+                currentName = nameValue;
+                console.log("Saving document...");
+
+                const modifed_model = model;
+                modifed_model.name = nameValue.current;
+                setDeckModel(id, model).then((result) => {
+                    console.log("Name saved");
+                }).catch((error) => {
+                    console.error("Failed to save name", error);
+                });
+            });
+        }, 5000);
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        }
+    }, []);
 
     return (
         <div>
             <Sidebar collapsible="icon">
             <SidebarTrigger />
                 <SidebarHeader>
-                <SidebarMenuItem>
-
-                </SidebarMenuItem>
-                C
-                <span className="sr-only"> {currentDeck?.name}</span>
+                
+                <input onChange={(e) => {handleChange(e.target.value)}} type="text" value={nameValue.current} />
 
                 </SidebarHeader>
 
