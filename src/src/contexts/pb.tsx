@@ -23,17 +23,22 @@ interface PocketContextType {
     getDeckModel: (deckId: string) => Promise<RecordModel>;
     setDeckModel: (deckId: string, model: RecordModel) => Promise<RecordModel>;
     deleteDeck: (deckId: string) => void;
+    createCard: (deckId: string) => Promise<RecordModel>;
+    getCards: (deckId: string) => Promise<RecordModel[]>;
+    setCardModel: (deckId: string, model: RecordModel) => Promise<RecordModel>;
+    deleteCard: (cardId: string) => Promise<boolean>;
 
     decks: RecordModel[];
 }
 
-//const url = 'http://192.168.0.14:8090/'
-const url = "https://pb.32kb.dev/";
+const url = 'http://192.168.0.14:8090/'
+//const url = "https://pb.32kb.dev/";
 
 const PocketContext = createContext<PocketContextType>({} as PocketContextType);
 
 export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
     const pb = useMemo(() => new PocketBase(url), []);
+    pb.autoCancellation(false)
 
     const [token, setToken] = useState(pb.authStore.token);
     const [user, setUser] = useState(pb.authStore.model);
@@ -111,6 +116,48 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
+    const createCard = async (deckId: string): Promise<RecordModel> => {
+        console.log("creating card")
+
+        if (!user) {
+            throw new Error("User not logged in");
+        }
+
+        const result = pb.collection('cards').create({
+            deck_id: deckId,
+            document: `question: "What is the capital of France?"
+answer: "Paris"`
+        })
+        return result
+    }
+
+    const getCards = async (deckId: string): Promise<RecordModel[]> => {
+        if (!user) {
+            throw new Error("User not logged in")
+        }
+
+        const result = pb.collection('cards').getFullList({
+            filter: `deck_id = "${deckId}"`
+        })
+
+        return result
+    }
+
+    const deleteCard = async (cardId: string): Promise<boolean> => {
+        try {
+            await pb.collection("cards").delete(cardId);
+            return true;
+        } catch (error) {
+            console.error("Card not found", error);
+            return false;
+        }
+    }
+
+    const setCardModel = async (deckId: string, model: RecordModel): Promise<RecordModel> => {
+        const result = await pb.collection("cards").update(deckId, model);
+        return result;
+    };
+
     return (
         <PocketContext.Provider
             value={{
@@ -125,6 +172,10 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
                 getDeckModel,
                 setDeckModel,
                 deleteDeck,
+                createCard,
+                getCards,
+                setCardModel,
+                deleteCard,
             }}
         >
             {children}

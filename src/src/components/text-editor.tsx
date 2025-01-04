@@ -1,5 +1,6 @@
 import React from "react";
 import CodeMirror from "@uiw/react-codemirror";
+import { EditorView } from "@uiw/react-codemirror";
 import { yaml } from "@codemirror/lang-yaml";
 
 interface EditorProps {
@@ -16,8 +17,9 @@ export function TextEditor({ value, onChange }: EditorProps) {
   return (
     <CodeMirror
       value={value}
+      className='w-full'
       //height={height}
-      extensions={[yaml()]}
+      extensions={[yaml(), EditorView.lineWrapping]}
       onChange={handleChange}
     />
   );

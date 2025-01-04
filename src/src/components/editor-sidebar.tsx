@@ -23,6 +23,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "./ui/input";
 
 import { useParams } from "react-router-dom";
 
@@ -34,16 +35,18 @@ export function EditorSidebar() {
     const { id } = useParams();
     const currentDeck = decks.find((deck) => deck.id === id);
     const nameValue = useRef<string>("");
+    const nameInputRef = useRef<HTMLInputElement>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
 
     const handleChange = (value: string) => {
-        console.log("Setting name to", value);
         nameValue.current = value;
     };
 
+    /**
+     * Save the name of the deck to the database every 10 seconds.
+     */
     useEffect(() => {
-        console.log("Starting syncing process for deck name")
 
         if (!id) {
             console.error("No deck id provided");
@@ -54,6 +57,10 @@ export function EditorSidebar() {
         getDeckModel(id).then((model) => {
             nameValue.current = model.name;
             handleChange(nameValue.current);
+
+            if (nameInputRef.current) {
+                nameInputRef.current.value = nameValue.current;
+            }
         })
 
         intervalRef.current = setInterval(() => {
@@ -62,7 +69,7 @@ export function EditorSidebar() {
                 
 
                 if (currentName === nameValue.current) {
-                    console.log("name has not changed");
+                    //console.log("name has not changed");
                     return;
                 }
 
@@ -72,12 +79,12 @@ export function EditorSidebar() {
                 const modifed_model = model;
                 modifed_model.name = nameValue.current;
                 setDeckModel(id, model).then((result) => {
-                    console.log("Name saved");
+                    //console.log("Name saved");
                 }).catch((error) => {
                     console.error("Failed to save name", error);
                 });
             });
-        }, 5000);
+        }, 10000);
 
         return () => {
             if (intervalRef.current) {
@@ -92,7 +99,7 @@ export function EditorSidebar() {
             <SidebarTrigger />
                 <SidebarHeader>
                 
-                <input onChange={(e) => {handleChange(e.target.value)}} type="text" value={nameValue.current} />
+                <Input ref={nameInputRef} onChange={(e) => {handleChange(e.target.value)}} type="text" />
 
                 </SidebarHeader>
 
