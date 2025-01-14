@@ -10,7 +10,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarTrigger
+    SidebarTrigger,
 } from "@/components/ui/sidebar";
 
 import { ChevronUp, Copy, Plus } from "lucide-react";
@@ -23,29 +23,29 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link, useNavigate } from "react-router-dom";
 
 export function DashboardSidebar() {
-    const { user, decks, createDeck } = usePocket();
+    const { user, decks, createDeck, logout } = usePocket();
+
+    const navigate = useNavigate();
 
     const handleCreateDeck = async () => {
-        console.log("creating deck")
         const deck = await createDeck("new deck");
-        console.log(deck);
-    }
+    };
 
     return (
         <div>
             <Sidebar collapsible="icon">
-            <SidebarTrigger />
+                <SidebarTrigger />
                 <SidebarHeader>
                 </SidebarHeader>
 
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel>Create a deck</SidebarGroupLabel>
+                        <SidebarGroupLabel className='text-md'>Create a deck</SidebarGroupLabel>
                         <SidebarGroupAction onClick={handleCreateDeck}>
-                            <Plus />{" "}
-                            <span className="sr-only">Add Project</span>
+                            <Plus />
                         </SidebarGroupAction>
                         <SidebarGroupContent></SidebarGroupContent>
                     </SidebarGroup>
@@ -71,8 +71,13 @@ export function DashboardSidebar() {
                                     <DropdownMenuItem>
                                         <span>Account</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <span>Sign out</span>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            logout()
+                                            navigate("/");
+                                        }}
+                                    >
+                                        Sign out
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

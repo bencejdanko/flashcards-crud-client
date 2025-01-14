@@ -16,7 +16,7 @@ import {
 
 export function DashboardMenu() {
     return (
-        <Menubar className='rounded-none shadow-none border-none'>
+        <Menubar className='rounded-none shadow-none border-none m-2'>
             <MenubarMenu>
                 <MenubarTrigger>
                     <strong>flashcards</strong>

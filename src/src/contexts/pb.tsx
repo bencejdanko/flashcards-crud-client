@@ -31,8 +31,9 @@ interface PocketContextType {
     decks: RecordModel[];
 }
 
-const url = 'http://192.168.0.14:8090/'
+//const url = 'http://192.168.0.14:8090/'
 //const url = "https://pb.32kb.dev/";
+const url = "http://127.0.0.1:8090/"
 
 const PocketContext = createContext<PocketContextType>({} as PocketContextType);
 
@@ -126,7 +127,9 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
         const result = pb.collection('cards').create({
             deck_id: deckId,
             document: `question: "What is the capital of France?"
-answer: "Paris"`
+answer: "Paris"
+type: "fill-in-the-blank"`,
+            approved: true,
         })
         return result
     }
