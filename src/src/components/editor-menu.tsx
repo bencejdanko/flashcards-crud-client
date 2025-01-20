@@ -16,74 +16,61 @@ import {
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 
+import { ChevronDown, ChevronLeft, Menu, Plus, Search, Undo2 } from "lucide-react";
+
 export function EditorMenu() {
     return (
-        <Menubar className="rounded-none shadow-none border-none m-2 flex justify-between">
-            <div className="flex">
+        <Menubar className="rounded-none shadow-none border-none m-2 flex justify-between h-8 ">
+            <div className="flex items-center gap-2 h-full">
                 <MenubarMenu>
-                    <MenubarTrigger>
-                        <strong>flashcards</strong>
+                    <MenubarTrigger className="border h-full pl-1">
+                        <Link
+                            to={"/dashboard"}
+                            className="flex items-center gap-1"
+                        >
+                            <ChevronLeft size={20} />
+                            Back to Dashboard
+                        </Link>
+                    </MenubarTrigger>
+                </MenubarMenu>
+
+                <MenubarMenu>
+                    <MenubarTrigger className="border h-full aspect-square p-1">
+                        <Menu size={15} />
                     </MenubarTrigger>
                     <MenubarContent>
-                        <MenubarItem>
-                            About Learner
+                        <MenubarItem disabled={true}>
+                            Import Project YAML
                         </MenubarItem>
-                        <MenubarSeparator />
-                        <MenubarItem>
-                            Account Settings
-                        </MenubarItem>
-                        <MenubarItem>
-                            Sign out
-                        </MenubarItem>
-                        <MenubarSeparator />
-                        <MenubarItem>
-                            Landing page
+                        <MenubarItem disabled={true}>
+                            Download Project YAML
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
 
                 <MenubarMenu>
-                    <MenubarTrigger>File</MenubarTrigger>
+                    <MenubarTrigger className="border h-full p-1">
+                        <Search size={15} />
+                    </MenubarTrigger>
                     <MenubarContent>
-                        <MenubarItem>
-                            Export as YAML
+                        <MenubarItem disabled={true}>
+                            Search
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
 
                 <MenubarMenu>
-                    <MenubarTrigger>Decks</MenubarTrigger>
-                    <MenubarContent>
-                        <MenubarItem>
-                            New deck{" "}
-                            <MenubarShortcut>Shift-Ctrl-N</MenubarShortcut>
-                        </MenubarItem>
-                    </MenubarContent>
-                </MenubarMenu>
-                <MenubarMenu>
-                    <MenubarTrigger>Help</MenubarTrigger>
-                    <MenubarContent>
-                        <MenubarItem>
-                            Documentation
-                        </MenubarItem>
-                        <MenubarSeparator />
-                        <MenubarItem>
-                            Feedback
-                        </MenubarItem>
-                        <MenubarItem>
-                            Support
-                        </MenubarItem>
-                    </MenubarContent>
+                    <MenubarTrigger className="border h-full p-0">
+                        <div className='hover:bg-green-700 bg-green-600 h-full rounded-l text-center justify-center flex items-center px-2 text-white'>
+                            Publish
+                        </div>
+                        <div className='p-1 hover:bg-gray-300 h-full rounded-r text-center justify-center flex items-center'>
+                            <Undo2 size={15} />
+                        </div>
+                    </MenubarTrigger>
                 </MenubarMenu>
             </div>
 
-            <MenubarMenu>
-                <Link to={"/dashboard"}>
-                    <Button>
-                        Back to Dashboard
-                    </Button>
-                </Link>
-            </MenubarMenu>
         </Menubar>
     );
 }

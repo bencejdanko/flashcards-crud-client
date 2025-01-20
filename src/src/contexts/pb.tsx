@@ -156,8 +156,8 @@ type: "fill-in-the-blank"`,
         }
     }
 
-    const setCardModel = async (deckId: string, model: RecordModel): Promise<RecordModel> => {
-        const result = await pb.collection("cards").update(deckId, model);
+    const setCardModel = async (cardId: string, model: RecordModel): Promise<RecordModel> => {
+        const result = await pb.collection("cards").update(cardId, model);
         return result;
     };
 

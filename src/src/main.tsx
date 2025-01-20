@@ -4,9 +4,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
 import ErrorPage from "./error-page.jsx";
-import { Editor, Home, Login, Register, Dashboard } from "./routes/";
+import { Dashboard, Editor, Home, Login, Register } from "./routes/";
 
 import { PocketProvider } from "./contexts/pb.js";
+import { EditorTabsProvider } from "./contexts/editor-tabs.js";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -15,12 +16,14 @@ import { DashboardSidebar, EditorSidebar } from "@/components/";
 function EditorLayout({ children }: { children: React.ReactNode }) {
   return (
     <div>
-      <SidebarProvider>
-        <EditorSidebar />
-        <main className="flex grow">
-          {children}
-        </main>
-      </SidebarProvider>
+      <EditorTabsProvider>
+        <SidebarProvider>
+          <EditorSidebar />
+          <main className="flex grow">
+            {children}
+          </main>
+        </SidebarProvider>
+      </EditorTabsProvider>
     </div>
   );
 }

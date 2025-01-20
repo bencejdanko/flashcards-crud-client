@@ -37,12 +37,26 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+import { Checkbox } from "@/components/ui/checkbox";
+
 import { Link } from "react-router-dom";
 
 import { usePocket } from "@/contexts/pb";
 
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 function Dashboard() {
     const { pb, user, decks, deleteDeck, createDeck } = usePocket();
@@ -84,7 +98,8 @@ function Dashboard() {
             <div className="flex">
                 <div
                     className="w-[300px] m-5 flex gap-5 bg-secondary rounded p-3 text-muted-foreground text-sm items-center focus-within:ring-2 focus-within:blue-500"
-                    onClick={() => document.getElementById('search-input')?.focus()}
+                    onClick={() =>
+                        document.getElementById("search-input")?.focus()}
                 >
                     <Search size={15} />
                     <input
@@ -117,18 +132,71 @@ function Dashboard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 w-full m-5 gap-5">
-                <button className="border border-primary rounded p-5 hover:border-blue-500 hover:bg-secondary">
-                    <div className='flex items-center text-left gap-10 '>
-                        <Plus />
-                        <div>
-                            <p>Empty deck</p>
-                            <p className="text-sm text-muted-foreground">
-                                Start from scratch
-                            </p>
+            <div className="w-full m-5 gap-5">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <button className="border border-primary rounded p-5 hover:border-blue-500 hover:bg-secondary">
+                            <div className="flex items-center text-left gap-10 w-[300px]">
+                                <Plus />
+                                <div>
+                                    <p>Empty deck</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Start from scratch
+                                    </p>
+                                </div>
+                            </div>
+                        </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Create a deck</DialogTitle>
+                            <DialogDescription>
+                                Add your deck name here, and any Tags to
+                                associate with it. Click create when you're
+                                ready.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="bg-secondary rounded flex-col flex border p-2 focus-within:border-blue-500">
+                            <Label htmlFor="email">Name</Label>
+                            <input
+                                type="email"
+                                placeholder="New Deck"
+                                className="rounded-none bg-muted focus-visible:ring-0 focus:outline-none"
+                                id="email"
+                            />
                         </div>
-                    </div>
-                </button>
+
+                        <div className="bg-secondary rounded border p-2 h-[100px]">
+                            <Label htmlFor="tags">Tags</Label>
+                        </div>
+
+                        <div className="">
+                            <Label>Create a tag</Label>
+                            <hr className="m-4" />
+                            <div className="flex gap-3">
+                                <Input
+                                    type="text"
+                                    placeholder="Tag name"
+                                    className="rounded-none  focus-visible:ring-0 focus:outline-none"
+                                    id="email"
+                                />
+                                <button>add</button>
+                            </div>
+                        </div>
+
+                        <div className="border shadow-sm h-200 flex flex-wrap gap-4">
+                            <div className="w-50 h-50 border shadow-sm m-4 p-2 flex items-center gap-2 text-sm bg-secondary">
+                                <Plus width={20} />
+                                DATA 220
+                            </div>
+                        </div>
+
+                        <DialogFooter>
+                            <Button type="submit">create</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <div className="flex flex-wrap m-5 gap-5">

@@ -20,7 +20,7 @@ function Home() {
             <div className="flex items-center gap-3">
               <img src="/icon.svg" className="w-10"></img>
               <strong>
-                <em>flashcards</em>
+                <>PoleStar</>
               </strong>
             </div>
           </MenubarMenu>
@@ -103,9 +103,9 @@ function Home() {
           </div>
         </div>
 
-        <div className="bg-primary h-full text-background">
+        <div className="bg-primary h-full text-background rounded-t-3xl">
           <div className="p-10">
-            <div className="text-5xl bg-gradient-to-r from-orange-500 via-white to-white bg-clip-text text-transparent animate-shimmer">
+            <div className="text-5xl">
               Unmatched productivity
             </div>
             <div className="mt-5">

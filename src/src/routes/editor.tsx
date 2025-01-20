@@ -1,20 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import { usePocket } from "@/contexts/pb";
-import { Chat, EditorMenu, TextEditor } from "@/components";
+import { EditorMenu, TextEditor } from "@/components";
 import { useParams } from "react-router-dom";
 import { RecordModel } from "pocketbase";
-import { Trash } from "lucide-react";
 
-import YAML from "yaml";
+import CodeEditorPanel from "@/components/code-editor-panel";
+
+import { useEditorTabs } from "@/contexts/editor-tabs";
 
 import {
     ResizableHandle,
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Button } from "@/components/ui/button";
-import { set } from "date-fns";
-import { AlertCircle, Cloud } from "lucide-react";
+
+import {
+    BookText,
+    Code,
+    Logs,
+    Plus,
+    Tags,
+    TagsIcon,
+    Trash,
+    TriangleAlert,
+    X,
+} from "lucide-react";
 
 function Editor() {
     const editorValue = useRef<string>("");
@@ -22,10 +32,13 @@ function Editor() {
     const [cards, setCards] = useState<RecordModel[]>([]);
     const [selectedCard, setSelectedCard] = useState<RecordModel | null>(null);
     const selectedCardIdRef = useRef<String | null>(null);
+    const [selectedTab, setSelectedTab] = useState<string>("1");
 
     const [saved, setSaved] = useState<boolean>(true);
 
     const { id } = useParams();
+
+    const { openCards, closeCard } = useEditorTabs();
 
     const {
         getDeckModel,
@@ -35,47 +48,6 @@ function Editor() {
         setCardModel,
         deleteCard,
     } = usePocket();
-
-    useEffect(() => {
-        /**
-         * Set a timer that will periodically update the active card in localstorage to the database.
-         */
-        async function handleSync() {
-            intervalRef.current = setInterval(() => {
-                if (!selectedCardIdRef.current) {
-                    return;
-                }
-
-                const localStorageCard = localStorage.getItem(
-                    selectedCardIdRef.current as string,
-                );
-
-                if (!localStorageCard) {
-                    return;
-                }
-
-                let currentCard = JSON.parse(localStorageCard);
-
-                //console.log("Saving document...");
-
-                setCardModel(currentCard.id, currentCard).then((result) => {
-                    //console.log("Document saved");
-                    setSaved(true);
-                    console.log("saving document...");
-                }).catch((error) => {
-                    //console.error("Failed to save document", error);
-                });
-            }, 10000);
-        }
-
-        handleSync();
-
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
-    }, []);
 
     /**
      * Save the editor to value to localstorage on each change.
@@ -149,140 +121,103 @@ function Editor() {
     return (
         <div className="flex flex-col w-full h-full overflow-auto">
             <EditorMenu />
-            <ResizablePanelGroup
-                direction="horizontal"
-                className="overflow-auto h-[750px]"
-            >
-                <ResizablePanel>
-                    <ResizablePanelGroup direction="vertical">
-                        <ResizablePanel>
-                            <Chat />
-                        </ResizablePanel>
-                        <ResizableHandle withHandle />
-                        <ResizablePanel>
-                            <div className="m-3">
-                                {saved
-                                    ? (
-                                        <div className="flex gap-3 items-center">
-                                            <Cloud
-                                                className="text-blue-500"
-                                                size={20}
-                                            />
-                                            <p className="text-sm text-muted-foreground">
-                                                Saved to the cloud
-                                            </p>
-                                        </div>
-                                    )
-                                    : (
-                                        <div className="flex gap-3 items-center">
-                                            <AlertCircle
-                                                className="text-red-500"
-                                                size={20}
-                                            />
-                                            <p className="text-sm text-muted-foreground">
-                                                Content currently saving...
-                                            </p>
-                                        </div>
-                                    )}
-                            </div>
-                            <div className="editor relative m-2 shadow shadow-lg">
-                                <TextEditor
-                                    value={editorValue.current}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </ResizablePanel>
-                    </ResizablePanelGroup>
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel>
-                    <ResizablePanelGroup direction="vertical">
-                        <ResizablePanel className="grid grid-cols-3">
-                            <div className="m-2 flex-col flex gap-2">
-                                <Button
-                                    className="bg-green-500"
-                                    onClick={handleNewCard}
-                                >
-                                    Fill-in-the-blank
-                                </Button>
+            {/* Tab UI */}
+            <div className="border-t grow">
+                {/* <TextEditor /> */}
 
-                                <p className="text-muted-foreground text-sm">
-                                    Coming soon
-                                </p>
-
-                                <Button
-                                    className="bg-green-500"
-                                    onClick={handleNewCard}
-                                    disabled={true}
-                                >
-                                    Matching Pairs
-                                </Button>
-
-                                <Button
-                                    className="bg-green-500"
-                                    onClick={handleNewCard}
-                                    disabled={true}
-                                >
-                                    Multiple choice
-                                </Button>
-                            </div>
-
-                            <div className="m-2 col-span-2">
-                                {cards.map((card) => {
-                                    if (!card.approved) {
-                                        return null;
-                                    }
-                                    let question = null;
-                                    try {
-                                        const parsed = YAML.parse(
-                                            card.document,
-                                        );
-                                        question = parsed.question ||
-                                            null;
-                                    } catch (error) {
-                                        // Ignore errors and keep question as "null"
-                                    }
-                                    return (
+                {openCards.length > 0 && (
+                            <div>
+                                <div className="flex flex-row ">
+                                    {openCards.map((cardId) => (
                                         <button
-                                            key={card.id}
-                                            className={`relative flex p-2 rounded w-full ${
-                                                card === selectedCard
-                                                    ? "bg-secondary"
-                                                    : ""
-                                            }`}
+                                            className={`w-[100px] border-r ${
+                                                cardId == selectedTab
+                                                    ? "border-t border-t-4 border-t-blue-500"
+                                                    : "border-b"
+                                            } px-1 py-1 flex justify-between text-sm`}
                                             onClick={() =>
-                                                handleSetSelectedCard(card)}
+                                                setSelectedTab(cardId)}
                                         >
-                                            <div
-                                                className={`mr-10 overflow-y-auto whitespace-nowrap overflow-hidden text-ellipsis ${
-                                                    question
-                                                        ? ""
-                                                        : "italic text-muted-foreground"
-                                                }`}
-                                            >
-                                                {question || "Untitled Card"}
-                                            </div>
+                                            {cardId}
                                             <button
-                                                className="absolute right-0 top-0 p-2 text-red-500"
-                                                onClick={handleDeleteCard}
+                                                className="h-full text-muted-foreground"
+                                                onClick={() =>
+                                                    closeCard(cardId)}
                                             >
-                                                <Trash
-                                                    size={20}
-                                                />
+                                                <X size={12} />
                                             </button>
                                         </button>
-                                    );
-                                })}
+                                    ))}
+                                    <div className="flex-grow border-b items-center flex">
+                                        <button className="pl-2">
+                                            <Plus
+                                                size={15}
+                                                onClick={() => {}}
+                                            />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex-grow border-b p-5 flex justify-between items-center">
+                                    <div className="flex gap-2">
+                                        <button className="border p-2 items-center flex rounded">
+                                            <TagsIcon size={20} />
+                                        </button>
+
+                                        <button className="border p-2 flex gap-2 items-center text-sm rounded">
+                                            <Trash size={15} />
+                                            Delete
+                                        </button>
+                                    </div>
+
+                                    <div className="flex flex-row gap-3">
+                                        <div className="grid grid-cols-2 border rounded text-sm">
+                                            <div className="border-r p-2 flex gap-2 items-center">
+                                                <Logs size={15} />
+                                                Form
+                                            </div>
+                                            <div className="p-2 flex gap-2 items-center">
+                                                <Code size={15} />
+                                                Code
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 border rounded text-sm">
+                                            <div className="border-r p-2 flex gap-2 items-center">
+                                                <BookText size={15} />
+                                                Preview
+                                            </div>
+                                            <div className="p-2 flex gap-2 items-center">
+                                                <TriangleAlert size={15} />
+                                                Errors
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <ResizablePanelGroup
+                                    className="grow"
+                                    direction="horizontal"
+                                >
+                                    <ResizablePanel>Editor</ResizablePanel>
+                                    <ResizableHandle withHandle />
+                                    <ResizablePanel>Preview</ResizablePanel>
+                                </ResizablePanelGroup>
                             </div>
-                        </ResizablePanel>
-                        <ResizablePanel>
-                            <div className="m-2 text-lg font-bold">
-                                Generated cards
+                        ) || (
+                    <div className="p-5">
+                        <div className="p-10">
+                            <div className="text-3xl">Flashcards Editor</div>
+                            <div className="text-xl text-muted-foreground">
+                                A modern editor for creating flashcards.
                             </div>
-                        </ResizablePanel>
-                    </ResizablePanelGroup>
-                </ResizablePanel>
-            </ResizablePanelGroup>
+
+                            <div className="text-xl mt-5">Create with AI</div>
+                            <div className="text-xl mt-5">Import existing</div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
