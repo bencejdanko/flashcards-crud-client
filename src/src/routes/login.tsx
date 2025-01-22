@@ -28,12 +28,7 @@ export const Login = () => {
     const { user, login, logout } = usePocket();
 
     if (user) {
-        return (
-            <div>
-                Already logged in as: {JSON.stringify(user)}
-                <Button onClick={logout}>Logout</Button>
-            </div>
-        );
+        navigate("/dashboard");
     }
 
     const handleSubmit = async (event: any) => {

@@ -171,18 +171,7 @@ export function EditorSidebar() {
 
     return (
         <div>
-            <Sidebar collapsible="icon">
-                <SidebarHeader>
-                    <div className="flex justify-between items-center">
-                        <div />
-                        {/* <SidebarTrigger /> */}
-                    </div>
-
-                    <div className="p-2 bg-secondary rounded border">
-                        <Icon width={30} height={30} />
-                    </div>
-                </SidebarHeader>
-
+            <Sidebar collapsible="icon" className='pb-5'>
                 <SidebarContent>
                     <SidebarGroup>
                         {/* <SidebarGroupLabel>Add a card</SidebarGroupLabel> */}

@@ -37,7 +37,7 @@ export function DashboardSidebar() {
 
     return (
         <div>
-            <Sidebar collapsible="icon">
+            <Sidebar collapsible="icon" className="pb-5">
                 <SidebarTrigger />
                 <SidebarHeader>
                 </SidebarHeader>

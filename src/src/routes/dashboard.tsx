@@ -5,8 +5,20 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Copy, Delete, Download, Edit, PlayIcon, Trash } from "lucide-react";
+import {
+    Check,
+    ChevronsUpDown,
+    Copy,
+    Delete,
+    Download,
+    Edit,
+    PlayIcon,
+    PlusSquare,
+    Trash,
+} from "lucide-react";
 import { DashboardMenu } from "@/components";
+
+import { useState } from "react";
 
 import {
     Tooltip,
@@ -37,13 +49,30 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    CommandSeparator,
+    CommandShortcut,
+} from "@/components/ui/command";
+
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { Link } from "react-router-dom";
 
 import { usePocket } from "@/contexts/pb";
 
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -59,6 +88,21 @@ import {
 } from "@/components/ui/dialog";
 
 function Dashboard() {
+    const [tag, setTag] = useState("");
+    const [open, setOpen] = useState(false);
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [deckNae, setDeckName] = useState("");
+    const frameworks = [
+        {
+            value: "DATA 220",
+            label: "DATA 220",
+        },
+        {
+            value: "DATA 226",
+            label: "DATA 226",
+        },
+    ];
+
     const { pb, user, decks, deleteDeck, createDeck } = usePocket();
 
     const handleCreateDeck = async () => {
@@ -147,7 +191,7 @@ function Dashboard() {
                             </div>
                         </button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <DialogContent className="sm:max-w-[425px] gap-2">
                         <DialogHeader>
                             <DialogTitle>Create a deck</DialogTitle>
                             <DialogDescription>
@@ -157,43 +201,116 @@ function Dashboard() {
                             </DialogDescription>
                         </DialogHeader>
 
+                        <Label htmlFor="name">Name</Label>
                         <div className="bg-secondary rounded flex-col flex border p-2 focus-within:border-blue-500">
-                            <Label htmlFor="email">Name</Label>
                             <input
-                                type="email"
-                                placeholder="New Deck"
+                                type="text"
+                                placeholder="Enter a deck name"
                                 className="rounded-none bg-muted focus-visible:ring-0 focus:outline-none"
-                                id="email"
+                                id="name"
                             />
                         </div>
 
-                        <div className="bg-secondary rounded border p-2 h-[100px]">
-                            <Label htmlFor="tags">Tags</Label>
-                        </div>
 
-                        <div className="">
-                            <Label>Create a tag</Label>
-                            <hr className="m-4" />
-                            <div className="flex gap-3">
-                                <Input
-                                    type="text"
-                                    placeholder="Tag name"
-                                    className="rounded-none  focus-visible:ring-0 focus:outline-none"
-                                    id="email"
-                                />
-                                <button>add</button>
-                            </div>
-                        </div>
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild className="p-2">
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={open}
+                                    className="w-full justify-between h-[50px]"
+                                >
+                                    <div className="flex gap-2">
+                                        {selectedTags && selectedTags.length > 0
+                                            ? selectedTags.map((tag) => (
+                                                <button className="bg-primary text-background p-2 rounded text-xs justify-between flex flex-row gap-2">
+                                                    {tag}
+                                                    <button 
+                                                        className='hover:bg-red-500 rounded flex items-center justify-center'
+                                                        onClick={() => {
+                                                            setSelectedTags(selectedTags.filter((selectedTag) => selectedTag !== tag));
+                                                        }}
+                                                        
+                                                        >
+                                                        <X />
+                                                    </button>
+                                                </button>
+                                            ))
+                                            : (
+                                                <p className="text-muted-foreground font-light">
+                                                    Which tag best represents
+                                                    this deck?
+                                                </p>
+                                            )}
+                                    </div>
+                                    <Plus className="opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className=" p-0">
+                                <Command>
+                                    <CommandInput
+                                        placeholder="Search or create a new tag"
+                                        className=""
+                                        onInput={(e) => setTag(e.target.value)}
+                                    />
+                                    <CommandList>
+                                        <CommandEmpty className="wrap">
+                                            <button 
+                                            
+                                                className="flex gap-2 items-center px-2 h-10 border-b hover:bg-blue-50 w-full"
+                                                onClick={() => {
+                                                    setSelectedTags([...selectedTags, tag]);
+                                                    
+                                                }}
+                                                
+                                                >
+                                                <Plus
+                                                    size={20}
+                                                    className="text-muted-foreground"
+                                                />
+                                                <p className="text-muted-foreground">
+                                                    Add new tag
+                                                </p>
+                                                <p>"{tag}"</p>
+                                            </button>
+                                        </CommandEmpty>
+                                        <CommandGroup className="p-0">
 
-                        <div className="border shadow-sm h-200 flex flex-wrap gap-4">
-                            <div className="w-50 h-50 border shadow-sm m-4 p-2 flex items-center gap-2 text-sm bg-secondary">
-                                <Plus width={20} />
-                                DATA 220
-                            </div>
-                        </div>
+                                            {tag.length > 0 ? (<button className="flex gap-2 items-center px-2 h-10 border-b hover:bg-blue-50 w-full">
+                                                <Plus
+                                                    size={20}
+                                                    className="text-muted-foreground"
+                                                />
+                                                <p className="text-muted-foreground">
+                                                    Create new tag
+                                                </p>
+                                                <p>"{tag}"</p>
+                                            </button>) : null}
+
+                                            {frameworks.map((framework) => (
+                                                <CommandItem
+                                                    key={framework.value}
+                                                    value={framework.value}
+                                                    onSelect={(
+                                                        currentValue,
+                                                    ) => {
+                                                        setSelectedTags([
+                                                            ...selectedTags,
+                                                            currentValue,
+                                                        ]);
+                                                    }}
+                                                >
+                                                    {framework.label}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
 
                         <DialogFooter>
-                            <Button type="submit">create</Button>
+                            <Button type="submit">Create</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
