@@ -6,12 +6,16 @@ import "./index.css";
 import ErrorPage from "./error-page.jsx";
 import { Dashboard, Editor, Home, Login, Register } from "./routes/";
 
-import { PocketProvider } from "./contexts/pb.js";
+import { PocketProvider } from "./contexts/index.ts";
+
 import { EditorTabsProvider } from "./contexts/editor-tabs.js";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 import { DashboardSidebar, EditorSidebar } from "@/components/";
+
+import { Toaster } from "@/components/ui/toaster"
+
 
 function EditorLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -79,6 +83,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <PocketProvider>
       <RouterProvider router={router} />
+      <Toaster />
     </PocketProvider>
   </StrictMode>,
 );

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { usePocket } from "@/contexts/pb";
+import { usePocket } from "@/contexts";
 import { EditorMenu, TextEditor } from "@/components";
 import { useParams } from "react-router-dom";
 import { RecordModel } from "pocketbase";
@@ -40,15 +40,6 @@ function Editor() {
 
     const { openCards, closeCard } = useEditorTabs();
 
-    const {
-        getDeckModel,
-        setDeckModel,
-        createCard,
-        getCards,
-        setCardModel,
-        deleteCard,
-    } = usePocket();
-
     /**
      * Save the editor to value to localstorage on each change.
      * This is useful for asyncronous saving of the document.
@@ -63,19 +54,6 @@ function Editor() {
 
         localStorage.setItem(modifiedCard.id, JSON.stringify(modifiedCard));
     }, [editorValue.current]);
-
-    useEffect(() => {
-        if (!id) {
-            return;
-        }
-
-        async function get(id: string) {
-            const cards = await getCards(id);
-            setCards(cards);
-        }
-
-        get(id);
-    }, [getCards, id]);
 
     interface Card {
         question?: string;
@@ -93,30 +71,6 @@ function Editor() {
     useEffect(() => {
     }, [saved]);
 
-    const handleNewCard = async () => {
-        if (!id) {
-            return;
-        }
-        const newCard = await createCard(id);
-        setCards([...cards, newCard]);
-    };
-
-    const handleSetSelectedCard = (card: RecordModel) => {
-        setSelectedCard(card);
-        selectedCardIdRef.current = card.id as string;
-        editorValue.current = card.document;
-    };
-
-    const handleDeleteCard = async () => {
-        if (!selectedCard) {
-            return;
-        }
-
-        await deleteCard(selectedCard.id);
-        setCards(cards.filter((card) => card.id !== selectedCard.id));
-        setSelectedCard(null);
-        editorValue.current = "";
-    };
 
     return (
         <div className="flex flex-col w-full h-full overflow-auto">
@@ -130,7 +84,7 @@ function Editor() {
                                 <div className="flex flex-row ">
                                     {openCards.map((cardId) => (
                                         <button
-                                            className={`w-[100px] border-r ${
+                                            className={`w-auto w-max-[300px] border-r ${
                                                 cardId == selectedTab
                                                     ? "border-t border-t-4 border-t-blue-500"
                                                     : "border-b"
@@ -138,9 +92,11 @@ function Editor() {
                                             onClick={() =>
                                                 setSelectedTab(cardId)}
                                         >
-                                            {cardId}
+                                            <p className="overflow-hidden text-ellipsis whitespace-nowrap mx-3">
+                                                {cardId}
+                                            </p>
                                             <button
-                                                className="h-full text-muted-foreground"
+                                                className="h-full text-muted-foreground hover:bg-muted aspect-square rounded flex justify-center items-center"
                                                 onClick={() =>
                                                     closeCard(cardId)}
                                             >

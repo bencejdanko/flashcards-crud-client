@@ -15,7 +15,7 @@ import {
 
 import { AlertCircle, ChevronUp, Copy, Pen, Plus, Trash } from "lucide-react";
 
-import { usePocket } from "@/contexts/pb";
+import { usePocket } from "@/contexts";
 
 import YAML from "yaml";
 
@@ -50,8 +50,9 @@ import { useEditorTabs } from "@/contexts/editor-tabs";
 import { add } from "date-fns";
 
 export function EditorSidebar() {
-    const { user, decks, setDeckModel, getDeckModel, createCard, getCards } =
-        usePocket();
+    
+
+
     const [deckId, setDeckId] = useState<string | undefined>(undefined);
     const { id } = useParams();
     const [currentDeck, setCurrentDeck] = useState<RecordModel | undefined>(
@@ -64,23 +65,6 @@ export function EditorSidebar() {
 
     const { openCard } = useEditorTabs();
 
-    useEffect(() => {
-        setDeckId(id);
-    });
-
-    useEffect(() => {
-        if (deckId) {
-            getCards(deckId).then((cards) => {
-                setCards(cards);
-            });
-        }
-    }, [deckId]);
-
-    useEffect(() => {
-        const current = decks.find((deck) => deck.id === deckId);
-        setCurrentDeck(current);
-    }, []);
-
     const questions = [
         {
             title: "flashcard",
@@ -90,9 +74,6 @@ export function EditorSidebar() {
                     console.error("No deck id provided");
                     return;
                 }
-
-                createCard(deckId),
-                openCard(deckId)
                 
             },
             icon: CardsThin,
@@ -102,7 +83,7 @@ export function EditorSidebar() {
 
         {
             title: "input",
-            action: createCard,
+            action: () => {},
             icon: InputIcon,
             info: "User enters into an input box.",
             disabled: false,
@@ -110,7 +91,7 @@ export function EditorSidebar() {
 
         {
             title: "matching",
-            action: createCard,
+            action: () => {},
             icon: Mesh,
             info: "Match several terms to eachother.",
             disabled: true,
@@ -120,54 +101,6 @@ export function EditorSidebar() {
     const handleChange = (value: string) => {
         nameValue.current = value;
     };
-
-    /**
-     * Save the name of the deck to the database every 10 seconds.
-     */
-    useEffect(() => {
-        if (!deckId) {
-            console.error("No deck id provided");
-            return;
-        }
-
-        // get initial name
-        getDeckModel(deckId).then((model) => {
-            nameValue.current = model.name;
-            handleChange(nameValue.current);
-
-            if (nameInputRef.current) {
-                nameInputRef.current.value = nameValue.current;
-            }
-        });
-
-        intervalRef.current = setInterval(() => {
-            getDeckModel(deckId!).then((model) => {
-                let currentName = model.name;
-
-                if (currentName === nameValue.current) {
-                    //console.log("name has not changed");
-                    return;
-                }
-
-                currentName = nameValue;
-                console.log("Saving document...");
-
-                const modifed_model = model;
-                modifed_model.name = nameValue.current;
-                setDeckModel(deckId, model).then((result) => {
-                    //console.log("Name saved");
-                }).catch((error) => {
-                    console.error("Failed to save name", error);
-                });
-            });
-        }, 10000);
-
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
-    }, [deckId]);
 
     return (
         <div>
@@ -202,7 +135,6 @@ export function EditorSidebar() {
                                                 className="flex justify-between"
                                                 disabled={question.disabled}
                                                 onClick={() => {
-                                                    question.action(deckId);
                                                     
                                                 }}
                                             >
@@ -240,7 +172,7 @@ export function EditorSidebar() {
                                         return null;
                                     }
                                     let question = null;
-                                    let type = null;
+                                    let type: string | null = null;
                                     let QuestionIcon = AlertCircle; // Default icon
 
                                     try {
@@ -331,7 +263,7 @@ export function EditorSidebar() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton>
-                                        {user?.email}
+                                        User email here
                                         <ChevronUp className="ml-auto" />
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>

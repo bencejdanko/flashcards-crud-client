@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { usePocket } from "@/contexts/pb";
+import { usePocket } from "@/contexts";
 import { AlertCircle, Cloud } from "lucide-react";
 
 
@@ -12,9 +12,10 @@ function CodeEditorPanel({ cardId, onChange }: CodeEditorPanelProps) {
     const editorValue = useRef<string>("");
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const [saved, setSaved] = useState<boolean>(true);
-    const { setCardModel } = usePocket();
 
     useEffect(() => {});
+
+    const id = cardId;
 
     return (
         <div className="m-3">

@@ -15,7 +15,7 @@ import {
 
 import { ChevronUp, Copy, Plus } from "lucide-react";
 
-import { usePocket } from "@/contexts/pb";
+import { usePocket } from "@/contexts";
 
 import {
     DropdownMenu,
@@ -25,30 +25,69 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import { AuthModel } from "pocketbase";
+
+import { Calendar } from "@/components/ui/calendar";
 
 export function DashboardSidebar() {
-    const { user, decks, createDeck, logout } = usePocket();
+
+    const { getUserModel, clearAuthStore } = usePocket();
+
+    const [user, setUser] = useState<AuthModel>();
+
+    useEffect(() => {
+        const { record, error } = getUserModel();
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        setUser(record);
+
+    })
+
+    const highlightedDays = [
+        new Date(2025, 0, 10),
+        new Date(2025, 0, 15),
+        new Date(2025, 0, 20),
+    ];
+
+    const modifiers = {
+        highlighted: highlightedDays,
+    };
+
+    const modifiersStyles = {
+        highlighted: {
+            backgroundColor: 'orange',
+            color: 'white',
+        },
+    };
+
 
     const navigate = useNavigate();
-
-    const handleCreateDeck = async () => {
-        const deck = await createDeck("new deck");
-    };
 
     return (
         <div>
             <Sidebar collapsible="icon" className="pb-5">
-                <SidebarTrigger />
+                {/* <SidebarTrigger /> */}
                 <SidebarHeader>
                 </SidebarHeader>
 
+                <Calendar 
+                    modifiers={modifiers}
+                    modifiersStyles={modifiersStyles}
+                />
+
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel className='text-md'>Create a deck</SidebarGroupLabel>
+                        {/* <SidebarGroupLabel className='text-md'>Create a deck</SidebarGroupLabel>
                         <SidebarGroupAction onClick={handleCreateDeck}>
                             <Plus />
                         </SidebarGroupAction>
-                        <SidebarGroupContent></SidebarGroupContent>
+                        <SidebarGroupContent></SidebarGroupContent> */}
                     </SidebarGroup>
 
                     <SidebarGroup />
@@ -61,7 +100,7 @@ export function DashboardSidebar() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton>
-                                        {user?.email}
+                                        Welcome back, <strong>{user ? user.name : "Unable to fetch user"}</strong>
                                         <ChevronUp className="ml-auto" />
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>
@@ -74,7 +113,7 @@ export function DashboardSidebar() {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => {
-                                            logout()
+                                            clearAuthStore();
                                             navigate("/");
                                         }}
                                     >

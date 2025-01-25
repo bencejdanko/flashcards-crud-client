@@ -6,11 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Cloud, FileInput, TextCursorInput } from "lucide-react";
 
-import { usePocket } from "@/contexts/pb";
+import { usePocket } from "@/contexts";
 import { useEffect } from "react";
 
 function Home() {
-  const { user, logout } = usePocket();
+
+  const user = {
+    email: "none",
+  };
+
 
   return (
     <div className="absolute w-full h-full bg-gradient-to-br from-blue-300 via-transparent to-transparent top-0">
@@ -20,7 +24,7 @@ function Home() {
             <div className="flex items-center gap-3">
               <img src="/icon.svg" className="w-10"></img>
               <strong>
-                <>PoleStar</>
+                <>flashcards</>
               </strong>
             </div>
           </MenubarMenu>
@@ -36,7 +40,7 @@ function Home() {
                 </MenubarMenu>
 
                 <MenubarMenu>
-                  <Button onClick={logout}>Logout</Button>
+                  <Button onClick={() => {}}>Logout</Button>
                 </MenubarMenu>
               </div>
             )}

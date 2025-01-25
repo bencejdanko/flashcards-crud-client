@@ -7,39 +7,76 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-
-import { usePocket } from "@/contexts/pb";
-
-import { useCallback, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 
+import { useNavigate } from "react-router-dom";
+
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
+
+import { usePocket } from "@/contexts";
+
+const loginFormSchema = z.object({
+    email: z.string()
+        .min(1, { message: "This field is required." })
+        .email("This is not a valid email format."),
+    password: z.string()
+        .min(8, "Your password must be longer than 8 letters.")
+        .max(71, "Your password can be up to 71 letters."),
+});
+
 export const Login = () => {
-    const emailRef = useRef<HTMLInputElement>(null);
-    const passwordRef = useRef<HTMLInputElement>(null);
-    const passwordConfirmRef = useRef<HTMLInputElement>(null);
-
     const navigate = useNavigate();
+    const { toast } = useToast();
+    const { authWithPassword } = usePocket();
 
-    const { user, login, logout } = usePocket();
+    const loginForm = useForm<z.infer<typeof loginFormSchema>>({
+        resolver: zodResolver(loginFormSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+    });
 
-    if (user) {
-        navigate("/dashboard");
-    }
+    async function onLoginFormSubmit(values: z.infer<typeof loginFormSchema>) {
+        const { record, error } = await authWithPassword(
+            values.email,
+            values.password,
+        );
 
-    const handleSubmit = async (event: any) => {
-        if (!emailRef.current?.value || !passwordRef.current?.value) {
+        if (error) {
+            toast({
+                variant: "destructive",
+                title: "Failed to authenticate!",
+                description:
+                    "Either your email or password is incorrect. Please re-enter, or reset your password.",
+            });
             return;
+        } else {
+            toast({
+                variant: "default",
+                title: "Successfully authenticated!",
+                description: "Welcome back!",
+            });
         }
 
-        await login(emailRef.current.value, passwordRef.current.value);
-
         navigate("/dashboard");
-    };
+    }
 
     return (
         <div className="absolute h-full w-full bg-gradient-to-br from-blue-300 via-transparent to-transparent top-0 -z-10">
@@ -66,32 +103,66 @@ export const Login = () => {
                                 </CardDescription>
                             </CardHeader>
 
-                            <CardContent className='flex gap-4 flex-col'>
-                                <div className="bg-blue-50 rounded flex-col flex border p-2 focus-within:border-blue-500">
-                                    <Label htmlFor="email">Email</Label>
-                                    <input
-                                        ref={emailRef}
-                                        type="email"
-                                        placeholder="example@example.com"
-                                        className="rounded-none bg-blue-50 focus-visible:ring-0 focus:outline-none"
-                                        id="email"
-                                    />
-                                </div>
+                            <CardContent className="flex gap-4 flex-col">
+                                <Form {...loginForm}>
+                                    <form
+                                        onSubmit={loginForm.handleSubmit(
+                                            onLoginFormSubmit,
+                                        )}
+                                    >
+                                        <FormField
+                                            control={loginForm.control}
+                                            name="email"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Email</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="email"
+                                                            placeholder="example@example.com"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        This is the email you
+                                                        used to sign up.
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                <div className="bg-blue-50 rounded flex-col flex border p-2 focus-within:border-blue-500">
-                                    <Label htmlFor="password">Password</Label>
-                                    <input
-                                        ref={passwordRef}
-                                        type="password"
-                                        placeholder="password"
-                                        className="rounded-none bg-transparent focus-visible:ring-0 focus:outline-none"
-                                        id="password"
-                                    />
-                                </div>
+                                        <FormField
+                                            control={loginForm.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Password
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="password"
+                                                            placeholder="********"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        This is the password you
+                                                        used to sign up.
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
+                                        <Button className='my-2' type="submit">
+                                            Submit
+                                        </Button>
+                                    </form>
+                                </Form>
                             </CardContent>
                             <CardFooter className="flex justify-between underline">
-                                <Button onClick={handleSubmit}>Login</Button>
                                 <div className="flex gap-10">
                                     <Link to="/register">
                                         Don't have an account? Register
