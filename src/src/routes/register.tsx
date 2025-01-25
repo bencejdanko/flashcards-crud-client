@@ -9,7 +9,6 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 
 import {
     Form,
@@ -63,7 +62,7 @@ export const Register = () => {
     async function onRegisterFormSubmit(
         values: z.infer<typeof registerFormSchema>,
     ) {
-        const { record, error } = await createUser(
+        const { error } = await createUser(
             values.email,
             values.name,
             values.password,

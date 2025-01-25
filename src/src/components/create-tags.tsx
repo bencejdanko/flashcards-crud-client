@@ -10,9 +10,7 @@ import {
     CommandGroup,
     CommandInput,
     CommandItem,
-    CommandList,
-    CommandSeparator,
-    CommandShortcut,
+    CommandList
 } from "@/components/ui/command";
 
 import { Button } from "@/components/ui/button";

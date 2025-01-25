@@ -1,6 +1,5 @@
 import { getPocketBase } from "./connection";
 
-import { RecordAuthResponse, RecordModel } from "pocketbase";
 import { PocketBaseError } from "./types";
 
 async function authWithPassword(
@@ -53,7 +52,7 @@ function getUserModel() {
 }
 
 async function clearAuthStore() {
-    const { pb, error } = getPocketBase();
+    const { pb } = getPocketBase();
     pb?.authStore.clear();
 }
 

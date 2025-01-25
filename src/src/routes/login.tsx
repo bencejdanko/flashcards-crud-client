@@ -54,7 +54,7 @@ export const Login = () => {
     });
 
     async function onLoginFormSubmit(values: z.infer<typeof loginFormSchema>) {
-        const { record, error } = await authWithPassword(
+        const { error } = await authWithPassword(
             values.email,
             values.password,
         );

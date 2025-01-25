@@ -1,4 +1,4 @@
-import PocketBase, { AuthModel, RecordModel, RecordAuthResponse } from "pocketbase";
+import { AuthModel, RecordModel, RecordAuthResponse } from "pocketbase";
 
 interface Deck {
     id: string,

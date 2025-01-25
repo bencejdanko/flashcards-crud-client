@@ -1,22 +1,13 @@
 import {
     Menubar,
-    MenubarCheckboxItem,
     MenubarContent,
     MenubarItem,
     MenubarMenu,
-    MenubarRadioGroup,
-    MenubarRadioItem,
-    MenubarSeparator,
-    MenubarShortcut,
-    MenubarSub,
-    MenubarSubContent,
-    MenubarSubTrigger,
     MenubarTrigger,
 } from "@/components/ui/menubar";
-import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 
-import { ChevronDown, ChevronLeft, Menu, Plus, Search, Undo2 } from "lucide-react";
+import {  ChevronLeft, Menu, Search, Undo2 } from "lucide-react";
 
 export function EditorMenu() {
     return (

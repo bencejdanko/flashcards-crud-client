@@ -2,7 +2,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -11,8 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { Plus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 
 import { z } from "zod";
@@ -20,7 +17,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { usePocket } from "@/contexts";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 import { Deck } from "@/contexts/pb/types";
 
@@ -42,7 +38,6 @@ const deckSchema = z.object({
 function UpdateDeckDialog({ children, deckProp, callback }: { children: React.ReactNode, deckProp: Deck, callback?: () => void }) {
     const { updateDeck } = usePocket();
     const { toast } = useToast();
-    const navigate = useNavigate();
 
     const deckForm = useForm<z.infer<typeof deckSchema>>({
         resolver: zodResolver(deckSchema),
@@ -77,7 +72,7 @@ function UpdateDeckDialog({ children, deckProp, callback }: { children: React.Re
         toast({
             variant: "success",
             title: "Deck updated!",
-            description: "You've successfully updated " + deck.name + ".",
+            description: "You've successfully updated " + deck!.name + ".",
         });
 
         if (callback) {

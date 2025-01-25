@@ -1,21 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import { usePocket } from "@/contexts";
+import { useEffect, useState } from "react";
 import { AlertCircle, Cloud } from "lucide-react";
 
 
-interface CodeEditorPanelProps {
-    cardId: string;
-    onChange: (value: string) => void;
-}
-
-function CodeEditorPanel({ cardId, onChange }: CodeEditorPanelProps) {
-    const editorValue = useRef<string>("");
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [saved, setSaved] = useState<boolean>(true);
+function CodeEditorPanel() {
+    const [saved] = useState<boolean>(true);
 
     useEffect(() => {});
-
-    const id = cardId;
 
     return (
         <div className="m-3">

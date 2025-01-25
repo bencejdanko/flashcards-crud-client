@@ -10,7 +10,7 @@ interface EditorProps {
 }
 
 export function TextEditor({ value, onChange }: EditorProps) {
-  const handleChange = React.useCallback((val: any, viewUpdate: any) => {
+  const handleChange = React.useCallback((val: any) => {
     onChange(val);
   }, [onChange]);
 

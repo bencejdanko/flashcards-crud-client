@@ -2,7 +2,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -10,8 +9,6 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
-import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -37,7 +34,7 @@ const deckSchema = z.object({
     description: z.string().optional(),
 });
 
-function CreateDeckDialog( { children, callback }: { children: React.ReactNode, callback?: () => void }) {
+function CreateDeckDialog( { children }: { children: React.ReactNode }) {
     const { createDeck } = usePocket();
     const { toast } = useToast();
     const navigate = useNavigate();

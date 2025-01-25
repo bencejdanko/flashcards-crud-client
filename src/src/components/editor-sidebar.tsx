@@ -3,19 +3,16 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupAction,
     SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { AlertCircle, ChevronUp, Copy, Pen, Plus, Trash } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { usePocket } from "@/contexts";
+import { AlertCircle, ChevronUp, Trash } from "lucide-react";
 
 import YAML from "yaml";
 
@@ -27,16 +24,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "./ui/input";
 
-import { useParams } from "react-router-dom";
-
 import { useEffect, useRef, useState } from "react";
 
-import { InfoCircledIcon, InputIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { InfoCircledIcon, InputIcon } from "@radix-ui/react-icons";
 
 import { RecordModel } from "pocketbase";
 
+// @ts-ignore
 import CardsThin from "@/assets/cards-thin.svg?react";
+// @ts-ignore
 import Mesh from "@/assets/mesh.svg?react";
+// @ts-ignore
 import Icon from "@/assets/icon.svg?react";
 
 import {
@@ -45,36 +43,51 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useParams } from "react-router-dom";
+import { usePocket } from "@/contexts";
 
-import { useEditorTabs } from "@/contexts/editor-tabs";
-import { add } from "date-fns";
+import { Deck } from "@/contexts/pb/types";
 
 export function EditorSidebar() {
-    
-
-
     const [deckId, setDeckId] = useState<string | undefined>(undefined);
-    const { id } = useParams();
-    const [currentDeck, setCurrentDeck] = useState<RecordModel | undefined>(
-        undefined,
-    );
+    const [deck, setDeck] = useState<Deck | undefined>(undefined);
+
     const nameValue = useRef<string>("");
     const nameInputRef = useRef<HTMLInputElement>(null);
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [cards, setCards] = useState<RecordModel[]>([]);
+    const [cards] = useState<RecordModel[]>([]);
 
-    const { openCard } = useEditorTabs();
+    const { deck_id } = useParams();
+
+    const { getDeck } = usePocket();
+
+    useEffect(() => {
+        if (!deck_id) {
+            return;
+        }
+
+        async function fetchDeck() {
+            const { deck, error } = await getDeck(deck_id!);
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            setDeck(deck);
+        }
+
+        setDeckId(deck_id);
+        fetchDeck();
+    }, [deck_id]);
 
     const questions = [
         {
             title: "flashcard",
             action: () => {
-
                 if (!deckId) {
                     console.error("No deck id provided");
                     return;
                 }
-                
             },
             icon: CardsThin,
             info: "No user input.",
@@ -98,29 +111,18 @@ export function EditorSidebar() {
         },
     ];
 
-    const handleChange = (value: string) => {
-        nameValue.current = value;
-    };
-
     return (
         <div>
-            <Sidebar collapsible="icon" className='pb-5'>
+            <Sidebar collapsible="icon" className="pb-5">
                 <SidebarContent>
                     <SidebarGroup>
                         {/* <SidebarGroupLabel>Add a card</SidebarGroupLabel> */}
                         <SidebarGroupContent className="mb-5 mt-5">
                             <SidebarMenu>
-                                <SidebarMenuItem key="rename" className="ml-2">
-                                    <div className="flex items-center gap-3">
-                                        <Input
-                                            ref={nameInputRef}
-                                            onChange={(e) => {
-                                                handleChange(e.target.value);
-                                            }}
-                                            type="text"
-                                            className="overflow-hidden"
-                                        />
-                                    </div>
+                                <SidebarMenuItem key="name" className="ml-2">
+                                    <p className="font-bold text-lg">
+                                        {deck?.name}
+                                    </p>
                                 </SidebarMenuItem>
                             </SidebarMenu>
                         </SidebarGroupContent>
@@ -135,7 +137,6 @@ export function EditorSidebar() {
                                                 className="flex justify-between"
                                                 disabled={question.disabled}
                                                 onClick={() => {
-                                                    
                                                 }}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -164,94 +165,101 @@ export function EditorSidebar() {
                         <SidebarGroupLabel>Cards</SidebarGroupLabel>
                         <SidebarGroupContent className="bg-white rounded border">
                             <SidebarMenu>
-                                {cards.map((card) => {
-                                    const unknownType =
-                                        "Unknown: Unable to process card type.";
+                                {cards.length > 0
+                                    ? cards.map((card) => {
+                                        const unknownType =
+                                            "Unknown: Unable to process card type.";
 
-                                    if (!card.approved) {
-                                        return null;
-                                    }
-                                    let question = null;
-                                    let type: string | null = null;
-                                    let QuestionIcon = AlertCircle; // Default icon
-
-                                    try {
-                                        const parsed = YAML.parse(
-                                            card.document,
-                                            card.type,
-                                        );
-                                        question = parsed.question || null;
-                                        type = parsed.type || null;
-
-                                        console.log(parsed)
-
-                                        const matchedQuestion = questions.find(
-                                            (q) => q.title === type,
-                                        );
-
-                                        console.log(
-                                            "Matched question",
-                                            matchedQuestion,
-                                        );
-
-                                        if (matchedQuestion) {
-                                            QuestionIcon = matchedQuestion.icon;
-                                        } else {
-                                            type = unknownType;
+                                        if (!card.approved) {
+                                            return null;
                                         }
-                                    } catch (error) {
-                                        // Ignore errors and keep question as "null"
-                                    }
+                                        let question = null;
+                                        let type: string | null = null;
+                                        let QuestionIcon = AlertCircle; // Default icon
 
-                                    return (
-                                        <SidebarMenuItem key={card.id}>
-                                            <SidebarMenuButton
-                                                className="flex justify-between"
-                                                onClick={() => {}}
-                                            >
-                                                <div className="flex items-center gap-3 justify-between w-full">
-                                                    <span className="truncate flex items-center gap-2 mr-3 ">
-                                                        <TooltipProvider
-                                                            delayDuration={100}
-                                                        >
-                                                            <Tooltip>
-                                                                <TooltipTrigger
-                                                                    asChild
-                                                                >
-                                                                    <QuestionIcon
-                                                                        width={20}
-                                                                        className={`flex-shrink-0 ${
-                                                                            type ===
-                                                                                    unknownType
-                                                                                ? "text-red-500"
-                                                                                : ""
-                                                                        }`}
-                                                                    />
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    {type}
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
+                                        try {
+                                            const parsed = YAML.parse(
+                                                card.document,
+                                                card.type,
+                                            );
+                                            question = parsed.question || null;
+                                            type = parsed.type || null;
 
-                                                        {question}
-                                                    </span>
-                                                    <Trash
-                                                        width={15}
-                                                        className="ml-auto flex-shrink-0"
-                                                    />
-                                                </div>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    );
-                                })}
+                                            console.log(parsed);
+
+                                            const matchedQuestion = questions
+                                                .find(
+                                                    (q) => q.title === type,
+                                                );
+
+                                            console.log(
+                                                "Matched question",
+                                                matchedQuestion,
+                                            );
+
+                                            if (matchedQuestion) {
+                                                QuestionIcon =
+                                                    matchedQuestion.icon;
+                                            } else {
+                                                type = unknownType;
+                                            }
+                                        } catch (error) {
+                                            // Ignore errors and keep question as "null"
+                                        }
+
+                                        return (
+                                            <SidebarMenuItem key={card.id}>
+                                                <SidebarMenuButton
+                                                    className="flex justify-between"
+                                                    onClick={() => {}}
+                                                >
+                                                    <div className="flex items-center gap-3 justify-between w-full">
+                                                        <span className="truncate flex items-center gap-2 mr-3 ">
+                                                            <TooltipProvider
+                                                                delayDuration={100}
+                                                            >
+                                                                <Tooltip>
+                                                                    <TooltipTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <QuestionIcon
+                                                                            width={20}
+                                                                            className={`flex-shrink-0 ${
+                                                                                type ===
+                                                                                        unknownType
+                                                                                    ? "text-red-500"
+                                                                                    : ""
+                                                                            }`}
+                                                                        />
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>
+                                                                        {type}
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+
+                                                            {question}
+                                                        </span>
+                                                        <Trash
+                                                            width={15}
+                                                            className="ml-auto flex-shrink-0"
+                                                        />
+                                                    </div>
+                                                </SidebarMenuButton>
+                                            </SidebarMenuItem>
+                                        );
+                                    })
+                                    : (
+                                        <div className='h-60 flex justify-center items-center'>
+                                            No cards found.
+                                        </div>
+                                    )}
                             </SidebarMenu>
                         </SidebarGroupContent>
 
                         <SidebarGroupLabel>Files</SidebarGroupLabel>
                         <SidebarGroupContent className="bg-white rounded border">
                             <SidebarMenu>
-                               
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>

@@ -12,7 +12,6 @@ import {
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
@@ -28,7 +27,9 @@ import { Deck } from "@/contexts/pb/types";
 
 import { Delete, Edit, Play, RefreshCcw } from "lucide-react";
 
+// @ts-ignore
 import Spinner from "@/assets/spinner.svg?react";
+
 import { Link } from "react-router-dom";
 
 import { UpdateDeckDialog } from "./update-deck";

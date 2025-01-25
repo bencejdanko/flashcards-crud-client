@@ -3,17 +3,13 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupAction,
-    SidebarGroupContent,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { ChevronUp, Copy, Plus } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 
 import { usePocket } from "@/contexts";
 
@@ -24,7 +20,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { AuthModel } from "pocketbase";
@@ -86,6 +82,8 @@ export function DashboardSidebar() {
 
                 <Calendar
                     modifiers={modifiers}
+
+                    // @ts-ignore
                     modifiersStyles={modifiersStyles}
                     mode="single"
                     selected={date}

@@ -1,10 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { usePocket } from "@/contexts";
-import { EditorMenu, TextEditor } from "@/components";
-import { useParams } from "react-router-dom";
-import { RecordModel } from "pocketbase";
-
-import CodeEditorPanel from "@/components/code-editor-panel";
+import { useState } from "react";
+import { EditorMenu } from "@/components";
 
 import { useEditorTabs } from "@/contexts/editor-tabs";
 
@@ -19,7 +14,6 @@ import {
     Code,
     Logs,
     Plus,
-    Tags,
     TagsIcon,
     Trash,
     TriangleAlert,
@@ -27,50 +21,8 @@ import {
 } from "lucide-react";
 
 function Editor() {
-    const editorValue = useRef<string>("");
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [cards, setCards] = useState<RecordModel[]>([]);
-    const [selectedCard, setSelectedCard] = useState<RecordModel | null>(null);
-    const selectedCardIdRef = useRef<String | null>(null);
     const [selectedTab, setSelectedTab] = useState<string>("1");
-
-    const [saved, setSaved] = useState<boolean>(true);
-
-    const { id } = useParams();
-
     const { openCards, closeCard } = useEditorTabs();
-
-    /**
-     * Save the editor to value to localstorage on each change.
-     * This is useful for asyncronous saving of the document.
-     */
-    useEffect(() => {
-        if (!selectedCard) {
-            return;
-        }
-
-        let modifiedCard = selectedCard;
-        modifiedCard.document = editorValue.current;
-
-        localStorage.setItem(modifiedCard.id, JSON.stringify(modifiedCard));
-    }, [editorValue.current]);
-
-    interface Card {
-        question?: string;
-        answer?: string;
-        approved?: boolean;
-        tags?: string[];
-    }
-
-    const handleChange = (value: string) => {
-        // Store the editor value in localstorage
-        editorValue.current = value;
-        setSaved(false);
-    };
-
-    useEffect(() => {
-    }, [saved]);
-
 
     return (
         <div className="flex flex-col w-full h-full overflow-auto">

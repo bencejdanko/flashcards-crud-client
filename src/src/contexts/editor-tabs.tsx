@@ -1,9 +1,7 @@
 import {
     createContext,
-    useCallback,
     useContext,
     useEffect,
-    useMemo,
     useState,
 } from "react";
 
@@ -13,6 +11,7 @@ import { useParams } from "react-router-dom";
 interface EditorTabsType {
     openCard: (cardId: string) => void;
     closeCard: (cardId: string) => void;
+    getCurrentTabs: () => string[]; 
     openCards: string[];
 }
 
@@ -49,6 +48,7 @@ export const EditorTabsProvider = ({ children }: { children: React.ReactNode }) 
         <EditorTabsContext.Provider value={{
             openCard,
             closeCard,
+            getCurrentTabs,
             openCards,
         }}>
             {children}
