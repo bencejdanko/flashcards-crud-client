@@ -69,7 +69,7 @@ export const Login = () => {
             return;
         } else {
             toast({
-                variant: "default",
+                variant: "success",
                 title: "Successfully authenticated!",
                 description: "Welcome back!",
             });

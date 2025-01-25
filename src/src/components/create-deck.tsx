@@ -67,8 +67,9 @@ function CreateDeckDialog( { children, callback }: { children: React.ReactNode, 
         }
 
         toast({
+            variant: "success",
             title: "Deck created!",
-            description: "You've successfully created a new deck.",
+            description: "You've successfully created " + deck!.name + ".",
         });
 
         navigate(`/editor/${deck!.id}`);

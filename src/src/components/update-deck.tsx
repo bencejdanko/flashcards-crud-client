@@ -75,8 +75,9 @@ function UpdateDeckDialog({ children, deckProp, callback }: { children: React.Re
         }
 
         toast({
+            variant: "success",
             title: "Deck updated!",
-            description: "You've successfully updated the new deck.",
+            description: "You've successfully updated " + deck.name + ".",
         });
 
         if (callback) {

@@ -83,40 +83,56 @@ function PaginatingDecksTable({ limit = 10 }: { limit?: number }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {decks.length > 0 ? decks.map((deck: Deck) => (
-                        <TableRow key={deck.id}>
-                            <TableCell>
-                                <strong>{deck.name}</strong>
-                            </TableCell>
-                            <TableCell>{deck.description}</TableCell>
-                            <TableCell>
-                                {new Date(deck.created).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell>
-                                {new Date(deck.created).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell className="flex gap-2 text-muted-foreground">
-                                <Link to={`/editor/${deck.id}`} title='Open deck in the editor'>
-                                    <Play size={20} />
-                                </Link>
+                    {decks.length > 0
+                        ? decks.map((deck: Deck) => (
+                            <TableRow key={deck.id}>
+                                <TableCell>
+                                    <strong>{deck.name}</strong>
+                                </TableCell>
+                                <TableCell>{deck.description}</TableCell>
+                                <TableCell>
+                                    {new Date(deck.created)
+                                        .toLocaleDateString()}
+                                </TableCell>
+                                <TableCell>
+                                    {new Date(deck.created)
+                                        .toLocaleDateString()}
+                                </TableCell>
+                                <TableCell className="flex gap-2 text-muted-foreground">
+                                    <Link
+                                        to={`/editor/${deck.id}`}
+                                        title="Open deck in the editor"
+                                    >
+                                        <Play size={20} />
+                                    </Link>
 
-                                <UpdateDeckDialog deckProp={deck} callback={fetchDecks} >
-                                    <button title='Edit the deck name and description'>
-                                        <Edit size={20} />
+                                    <UpdateDeckDialog
+                                        deckProp={deck}
+                                        callback={fetchDecks}
+                                    >
+                                        <button title="Edit the deck name and description">
+                                            <Edit size={20} />
+                                        </button>
+                                    </UpdateDeckDialog>
+
+                                    <button title="Delete the deck">
+                                        <Delete size={20} />
                                     </button>
-                                </UpdateDeckDialog>
-
-                                <button title='Delete the deck'>
-                                    <Delete size={20} />
-                                </button>
-                            </TableCell>
-                        </TableRow>
-                    )) : (<div>Nothing</div>)}
+                                </TableCell>
+                            </TableRow>
+                        ))
+                        : (
+                            <TableRow>
+                                <TableCell colSpan={5} className=''>
+                                    <div className='h-5 justify-center flex'>No decks</div>
+                                </TableCell>
+                            </TableRow>
+                        )}
                 </TableBody>
                 <TableFooter>
                     <TableRow>
                         <TableCell colSpan={5}>
-                            <div className='flex justify-between w-full'>
+                            <div className="flex justify-between w-full">
                                 <Button onClick={fetchDecks}>
                                     <RefreshCcw size={20} />
                                 </Button>
@@ -128,7 +144,9 @@ function PaginatingDecksTable({ limit = 10 }: { limit?: number }) {
                                             </button>
                                         </PaginationItem>
                                         <PaginationItem>
-                                            <PaginationLink>{page}</PaginationLink>
+                                            <PaginationLink>
+                                                {page}
+                                            </PaginationLink>
                                         </PaginationItem>
                                         <PaginationItem>
                                             <button onClick={incrementPage}>

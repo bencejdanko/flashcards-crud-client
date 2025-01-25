@@ -8,13 +8,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { Plus } from "lucide-react";
+import { Plus, Bot } from "lucide-react";
 
 import { Search } from "lucide-react";
 import { CreateDeckDialog, PaginatingDecksTable } from "@/components";
 
 function Dashboard() {
-
     return (
         <div className="w-full">
             {/* <DashboardMenu /> */}
@@ -63,11 +62,11 @@ function Dashboard() {
                 </div>
             </div>
 
-            <div className="w-full m-5 gap-5">
+            <div className="w-full m-5 gap-5 flex">
                 <CreateDeckDialog>
                     <button className="border border-primary rounded p-5 hover:border-blue-500 hover:bg-secondary">
-                        <div className="flex items-center text-left gap-10 w-[300px]">
-                            <Plus />
+                        <div className="flex items-center text-left gap-10 w-[300px] h-[60px]">
+                            <Plus size={25}/>
                             <div>
                                 <p>Empty deck</p>
                                 <p className="text-sm text-muted-foreground">
@@ -77,6 +76,19 @@ function Dashboard() {
                         </div>
                     </button>
                 </CreateDeckDialog>
+
+                <button className="border border-primary rounded p-5 hover:border-blue-500 hover:bg-secondary">
+                    <div className="flex items-center text-left gap-10 w-[300px] h-[60px]">
+                        <Bot size={25} className="flex-shrink-0" />
+                        <div>
+                            <p>Create a deck with AI</p>
+                            <p className="text-sm text-muted-foreground">
+                                Query for online research, upload a document, or
+                                provide a youtube link to get started
+                            </p>
+                        </div>
+                    </div>
+                </button>
             </div>
 
             <div className="m-5">

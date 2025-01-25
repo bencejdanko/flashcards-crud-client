@@ -31,8 +31,9 @@ import { AuthModel } from "pocketbase";
 
 import { Calendar } from "@/components/ui/calendar";
 
-export function DashboardSidebar() {
+import { format } from "date-fns";
 
+export function DashboardSidebar() {
     const { getUserModel, clearAuthStore } = usePocket();
 
     const [user, setUser] = useState<AuthModel>();
@@ -46,26 +47,33 @@ export function DashboardSidebar() {
         }
 
         setUser(record);
-
-    })
+    });
 
     const highlightedDays = [
+        new Date(2025, 0, 11),
         new Date(2025, 0, 10),
         new Date(2025, 0, 15),
         new Date(2025, 0, 20),
     ];
 
+    const [date, setDate] = useState<Date | undefined>(new Date());
+
     const modifiers = {
-        highlighted: highlightedDays,
+        highlighted: highlightedDays
     };
 
     const modifiersStyles = {
-        highlighted: {
-            backgroundColor: 'orange',
-            color: 'white',
+        selected: {
+            "border-top": "2px solid #FF4136",
+            "border-top-left-radius": "0",
+            "border-top-right-radius": "0",
         },
+        highlighted: {
+            "border-top": "2px solid #2ECC40",
+            "border-top-left-radius": "0",
+            "border-top-right-radius": "0",
+        }
     };
-
 
     const navigate = useNavigate();
 
@@ -76,18 +84,25 @@ export function DashboardSidebar() {
                 <SidebarHeader>
                 </SidebarHeader>
 
-                <Calendar 
+                <Calendar
                     modifiers={modifiers}
                     modifiersStyles={modifiersStyles}
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
                 />
 
                 <SidebarContent>
                     <SidebarGroup>
-                        {/* <SidebarGroupLabel className='text-md'>Create a deck</SidebarGroupLabel>
-                        <SidebarGroupAction onClick={handleCreateDeck}>
-                            <Plus />
-                        </SidebarGroupAction>
-                        <SidebarGroupContent></SidebarGroupContent> */}
+                        <div>
+                            <h1>
+                                {date
+                                    ? format(date, "MMMM do, yyyy")
+                                    : "No date selected"}
+                            </h1>
+                            <hr className='my-2'/>
+                            <p>No events</p>
+                        </div>
                     </SidebarGroup>
 
                     <SidebarGroup />
@@ -100,7 +115,12 @@ export function DashboardSidebar() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton>
-                                        Welcome back, <strong>{user ? user.name : "Unable to fetch user"}</strong>
+                                        Welcome back,{" "}
+                                        <strong>
+                                            {user
+                                                ? user.name
+                                                : "Unable to fetch user"}
+                                        </strong>
                                         <ChevronUp className="ml-auto" />
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>

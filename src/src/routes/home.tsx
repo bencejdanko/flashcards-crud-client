@@ -6,14 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Cloud, FileInput, TextCursorInput } from "lucide-react";
 
+import { useEffect, useState } from "react";
+
 import { usePocket } from "@/contexts";
-import { useEffect } from "react";
+import { AuthModel } from "pocketbase";
 
 function Home() {
 
-  const user = {
-    email: "none",
-  };
+  const [user, setUser] = useState<AuthModel>();
+
+  const { getUserModel } = usePocket();
+
+  useEffect(() => {
+    const { record, error } = getUserModel();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setUser(record);
+  });
+
 
 
   return (
@@ -43,8 +57,11 @@ function Home() {
                   <Button onClick={() => {}}>Logout</Button>
                 </MenubarMenu>
               </div>
+            ) || (
+              <p>Sign up now!</p>
             )}
         </Menubar>
+        
         {/* Hero */}
         <div className="max-w-2xl text-center mx-auto mt-10">
           <h1 className="scroll-m-20 text-4xl tracking-tight ">
