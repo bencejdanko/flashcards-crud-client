@@ -15,10 +15,10 @@ function Home() {
 
   const [user, setUser] = useState<AuthModel>();
 
-  const { getUserModel } = usePocket();
+  const { getAuthModel } = usePocket();
 
   useEffect(() => {
-    const { record, error } = getUserModel();
+    const { record, error } = getAuthModel();
 
     if (error) {
       console.error(error);
@@ -61,7 +61,7 @@ function Home() {
               <p>Sign up now!</p>
             )}
         </Menubar>
-        
+
         {/* Hero */}
         <div className="max-w-2xl text-center mx-auto mt-10">
           <h1 className="scroll-m-20 text-4xl tracking-tight ">

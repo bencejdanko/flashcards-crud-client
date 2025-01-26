@@ -1,4 +1,4 @@
-import { getPocketBase } from "./connection";
+import { getPocketBase, baseUrl } from "./connection";
 
 import { PocketBaseError } from "./types";
 
@@ -41,7 +41,7 @@ async function createUser(email: string, name: string, password: string, passwor
     }
 }
 
-function getUserModel() {
+function getAuthModel() {
     const { pb, error } = getPocketBase();
 
     if (error) {
@@ -56,4 +56,4 @@ async function clearAuthStore() {
     pb?.authStore.clear();
 }
 
-export { authWithPassword, clearAuthStore, getUserModel, createUser };
+export { authWithPassword, clearAuthStore, getAuthModel, createUser };

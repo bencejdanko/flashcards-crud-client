@@ -53,7 +53,7 @@ async function createDeck(name: string, description?: string) {
         const deck = await pb!.collection("decks").create({
             name,
             description,
-            user: pb?.authStore.model?.id,
+            user_id: pb?.authStore.model?.id,
         }) as Deck;
         return { error: undefined, deck };
     } catch (error) {

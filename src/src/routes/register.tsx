@@ -79,7 +79,7 @@ export const Register = () => {
             return;
         } else {
             toast({
-                variant: "default",
+                variant: "success",
                 title: "Successfully registered!",
                 description: "You can now login.",
             });
@@ -210,7 +210,7 @@ export const Register = () => {
                                             )}
                                         />
 
-                                        <Button className='my-2' type="submit">
+                                        <Button className='my-2 bg-green-500' type="submit" disabled={!registerForm.formState.isValid}>
                                             Register
                                         </Button>
                                     </form>

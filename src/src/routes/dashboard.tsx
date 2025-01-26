@@ -12,10 +12,12 @@ import { Plus, Bot } from "lucide-react";
 import { Search } from "lucide-react";
 import { CreateDeckDialog, PaginatingDecksTable } from "@/components";
 
+import { DashboardMenu } from "@/components";
+
 function Dashboard() {
     return (
         <div className="w-full">
-            {/* <DashboardMenu /> */}
+            <DashboardMenu />
 
             <div className="m-5">
                 <p className="text-3xl">

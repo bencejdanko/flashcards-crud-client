@@ -29,13 +29,17 @@ import { Calendar } from "@/components/ui/calendar";
 
 import { format } from "date-fns";
 
+import { User } from "@/contexts/pb/types";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 export function DashboardSidebar() {
-    const { getUserModel, clearAuthStore } = usePocket();
+    const { getAuthModel, clearAuthStore, toStringUserAvatarUri } = usePocket();
 
     const [user, setUser] = useState<AuthModel>();
 
     useEffect(() => {
-        const { record, error } = getUserModel();
+        const { record, error } = getAuthModel();
 
         if (error) {
             console.error(error);
@@ -43,7 +47,7 @@ export function DashboardSidebar() {
         }
 
         setUser(record);
-    });
+    }, []);
 
     const highlightedDays = [
         new Date(2025, 0, 11),
@@ -55,20 +59,20 @@ export function DashboardSidebar() {
     const [date, setDate] = useState<Date | undefined>(new Date());
 
     const modifiers = {
-        highlighted: highlightedDays
+        highlighted: highlightedDays,
     };
 
     const modifiersStyles = {
         selected: {
-            "border-top": "2px solid #FF4136",
-            "border-top-left-radius": "0",
-            "border-top-right-radius": "0",
+            "borderTop": "2px solid #FF4136",
+            "borderTopLeftRadius": "0",
+            "borderTopRightRadius": "0",
         },
         highlighted: {
-            "border-top": "2px solid #2ECC40",
-            "border-top-left-radius": "0",
-            "border-top-right-radius": "0",
-        }
+            "borderTop": "2px solid #2ECC40",
+            "borderTopLeftRadius": "0",
+            "borderTopRightRadius": "0",
+        },
     };
 
     const navigate = useNavigate();
@@ -82,7 +86,6 @@ export function DashboardSidebar() {
 
                 <Calendar
                     modifiers={modifiers}
-
                     // @ts-ignore
                     modifiersStyles={modifiersStyles}
                     mode="single"
@@ -98,7 +101,7 @@ export function DashboardSidebar() {
                                     ? format(date, "MMMM do, yyyy")
                                     : "No date selected"}
                             </h1>
-                            <hr className='my-2'/>
+                            <hr className="my-2" />
                             <p>No events</p>
                         </div>
                     </SidebarGroup>
@@ -112,13 +115,30 @@ export function DashboardSidebar() {
                         <SidebarMenuItem>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton>
-                                        Welcome back,{" "}
-                                        <strong>
-                                            {user
-                                                ? user.name
-                                                : "Unable to fetch user"}
-                                        </strong>
+                                    <SidebarMenuButton className="flex items-center overflow-hidden">
+                                        <div className="flex-shrink-0 mr-2">
+                                            <Avatar className="w-8 h-8">
+                                                <AvatarImage
+                                                    src={user
+                                                        ? toStringUserAvatarUri(
+                                                            user as User,
+                                                        )
+                                                        : ""}
+                                                    alt={user ? user.name : ""}
+                                                />
+                                                <AvatarFallback>
+                                                    CN
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </div>
+                                        <span className="truncate">
+                                            <strong>
+                                                {user
+                                                    ? user.name
+                                                    : "Unable to fetch user"}
+                                            </strong>
+                                        </span>
+
                                         <ChevronUp className="ml-auto" />
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>

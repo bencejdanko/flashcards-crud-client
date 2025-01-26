@@ -2,8 +2,9 @@ import { AuthModel, RecordModel, RecordAuthResponse } from "pocketbase";
 
 interface Deck {
     id: string,
-    user: string,
+    user_id: string,
     name: string,
+    card_count: number,
     description?: string,
     created: string,
     updated: string
@@ -29,6 +30,7 @@ interface User {
     id: string,
     email: string,
     name: string,
+    deck_count: number,
     avatar?: string
 }
 
@@ -46,11 +48,18 @@ interface PocketBaseError {
 
 interface PocketContextType {
 
+    baseUrl: string,
+
     // Auth functionality
     authWithPassword: (email: string, password: string) => Promise<{ record: RecordAuthResponse<RecordModel> | undefined; error: PocketBaseError | undefined }>,
     createUser: (email: string, name: string, password: string, passwordConfirm: string) => Promise<{ error: PocketBaseError | undefined; record: RecordModel | undefined }>,
-    getUserModel: () => { error: PocketBaseError | undefined; record: AuthModel | undefined },
+    getAuthModel: () => { error: PocketBaseError | undefined; record: AuthModel | undefined },
     clearAuthStore: () => void,
+
+    // User functionality
+    getUser: (userId: string) => Promise<{ error: PocketBaseError | undefined; user: User | undefined }>,
+    toStringUserAvatarUri: (user: User) => string,
+
     
     // Card Functionality
     getCardList: (deckId: string, page: number, limit: number) => Promise<{ error: PocketBaseError | undefined; cards: Card[] | undefined }>,

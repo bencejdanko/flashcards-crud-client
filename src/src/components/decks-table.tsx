@@ -33,13 +33,15 @@ import Spinner from "@/assets/spinner.svg?react";
 import { Link } from "react-router-dom";
 
 import { UpdateDeckDialog } from "./update-deck";
+import { DeleteDeckDialog } from "./delete-deck";
 
 function PaginatingDecksTable({ limit = 10 }: { limit?: number }) {
     const [page, setPage] = useState(1);
     const [decks, setDecks] = useState<Deck[]>([]);
     const [loading, setLoading] = useState(false);
+    const [total, setTotal] = useState(0);
 
-    const { getDeckList } = usePocket();
+    const { getDeckList, getUser, getAuthModel } = usePocket();
 
     async function fetchDecks() {
         setLoading(true);
@@ -67,17 +69,29 @@ function PaginatingDecksTable({ limit = 10 }: { limit?: number }) {
     }
 
     useEffect(() => {
+        async function getUserDeckCount() {
+            const { record } = await getAuthModel();
+            const { user } = await getUser(record?.id || "");
+
+            setTotal(user?.deck_count || 0);
+        }
+
+        getUserDeckCount();
+    });
+
+    useEffect(() => {
         fetchDecks();
     }, [page]);
 
     return (
         loading ? <Spinner /> : (
             <Table>
-                <TableCaption>Decks</TableCaption>
+                <TableCaption>{total}/250 decks created</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Description</TableHead>
+                        <TableHead>Cards</TableHead>
                         <TableHead>Created</TableHead>
                         <TableHead>Last Modified</TableHead>
                         <TableHead>Actions</TableHead>
@@ -91,6 +105,7 @@ function PaginatingDecksTable({ limit = 10 }: { limit?: number }) {
                                     <strong>{deck.name}</strong>
                                 </TableCell>
                                 <TableCell>{deck.description}</TableCell>
+                                <TableCell>{deck.card_count}</TableCell>
                                 <TableCell>
                                     {new Date(deck.created)
                                         .toLocaleDateString()}
@@ -116,25 +131,35 @@ function PaginatingDecksTable({ limit = 10 }: { limit?: number }) {
                                         </button>
                                     </UpdateDeckDialog>
 
-                                    <button title="Delete the deck">
-                                        <Delete size={20} />
-                                    </button>
+                                    <DeleteDeckDialog
+                                        deckProp={deck}
+                                        callback={fetchDecks}
+                                    >
+                                        <button title="Delete the deck">
+                                            <Delete size={20} />
+                                        </button>
+                                    </DeleteDeckDialog>
                                 </TableCell>
                             </TableRow>
                         ))
                         : (
                             <TableRow>
-                                <TableCell colSpan={5} className=''>
-                                    <div className='h-5 justify-center flex'>No decks</div>
+                                <TableCell colSpan={6} className="">
+                                    <div className="h-5 justify-center flex">
+                                        No decks found.
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         )}
                 </TableBody>
                 <TableFooter>
                     <TableRow>
-                        <TableCell colSpan={5}>
+                        <TableCell colSpan={6}>
                             <div className="flex justify-between w-full">
-                                <Button onClick={fetchDecks}>
+                                <Button
+                                    onClick={fetchDecks}
+                                    className="absolute"
+                                >
                                     <RefreshCcw size={20} />
                                 </Button>
                                 <Pagination>

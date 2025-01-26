@@ -6,5 +6,16 @@ import { EditorSidebar } from "./editor-sidebar";
 import { CreateDeckDialog } from "./create-deck";
 import { PaginatingDecksTable } from "./decks-table";
 import { UpdateDeckDialog } from "./update-deck";
+import { DeleteDeckDialog } from "./delete-deck";
 
-export { DashboardMenu, DashboardSidebar, TextEditor, EditorSidebar, EditorMenu, CreateDeckDialog, PaginatingDecksTable, UpdateDeckDialog };
+export {
+    CreateDeckDialog,
+    DashboardMenu,
+    DashboardSidebar,
+    DeleteDeckDialog,
+    EditorMenu,
+    EditorSidebar,
+    PaginatingDecksTable,
+    TextEditor,
+    UpdateDeckDialog,
+};

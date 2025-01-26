@@ -95,7 +95,7 @@ function CreateDeckDialog( { children }: { children: React.ReactNode }) {
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>Name (Required)</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
@@ -128,7 +128,7 @@ function CreateDeckDialog( { children }: { children: React.ReactNode }) {
                             )}
                         />
 
-                        <Button className='my-2' type="submit">Create</Button>
+                        <Button className='my-2 bg-green-500' type="submit" disabled={!deckForm.formState.isValid}>Create</Button>
                     </form>
                 </Form>
             </DialogContent>

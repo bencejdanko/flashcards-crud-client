@@ -24,18 +24,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "./ui/input";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { InfoCircledIcon, InputIcon } from "@radix-ui/react-icons";
 
-import { RecordModel } from "pocketbase";
-
-// @ts-ignore
-import CardsThin from "@/assets/cards-thin.svg?react";
-// @ts-ignore
-import Mesh from "@/assets/mesh.svg?react";
-// @ts-ignore
-import Icon from "@/assets/icon.svg?react";
 
 import {
     Tooltip,
@@ -51,14 +43,10 @@ import { Deck } from "@/contexts/pb/types";
 export function EditorSidebar() {
     const [deckId, setDeckId] = useState<string | undefined>(undefined);
     const [deck, setDeck] = useState<Deck | undefined>(undefined);
-
-    const nameValue = useRef<string>("");
-    const nameInputRef = useRef<HTMLInputElement>(null);
-    const [cards] = useState<RecordModel[]>([]);
-
     const { deck_id } = useParams();
-
     const { getDeck } = usePocket();
+
+    const cards = []
 
     useEffect(() => {
         if (!deck_id) {
@@ -80,37 +68,6 @@ export function EditorSidebar() {
         fetchDeck();
     }, [deck_id]);
 
-    const questions = [
-        {
-            title: "flashcard",
-            action: () => {
-                if (!deckId) {
-                    console.error("No deck id provided");
-                    return;
-                }
-            },
-            icon: CardsThin,
-            info: "No user input.",
-            disabled: false,
-        },
-
-        {
-            title: "input",
-            action: () => {},
-            icon: InputIcon,
-            info: "User enters into an input box.",
-            disabled: false,
-        },
-
-        {
-            title: "matching",
-            action: () => {},
-            icon: Mesh,
-            info: "Match several terms to eachother.",
-            disabled: true,
-        },
-    ];
-
     return (
         <div>
             <Sidebar collapsible="icon" className="pb-5">
@@ -124,41 +81,6 @@ export function EditorSidebar() {
                                         {deck?.name}
                                     </p>
                                 </SidebarMenuItem>
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-
-                        <SidebarGroupLabel>Add a card</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {deckId &&
-                                    questions.map((question) => (
-                                        <SidebarMenuItem key={question.title}>
-                                            <SidebarMenuButton
-                                                className="flex justify-between"
-                                                disabled={question.disabled}
-                                                onClick={() => {
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <question.icon width={20} />
-                                                    {" "}
-                                                    {question.title}
-                                                </div>
-                                                <TooltipProvider
-                                                    delayDuration={100}
-                                                >
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <InfoCircledIcon />
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            {question.info}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    ))}
                             </SidebarMenu>
                         </SidebarGroupContent>
 
