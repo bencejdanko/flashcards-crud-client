@@ -18,7 +18,7 @@ async function getCardList(deckId: string, page: number, limit: number) {
     return { error: undefined, cards }
 }
 
-async function createCard(deckId: string, document: string) {
+async function createCard(deckId: string, type: string, document: string) {
     const { pb, error } = getPocketBase()
 
     if (error) {
@@ -29,7 +29,7 @@ async function createCard(deckId: string, document: string) {
         const card = await pb!.collection('cards').create({
             deck_id: deckId,
             document: document,
-            approved: true,
+            type: type,
         }) as Card
         return { error: undefined, card }
     } catch (error) {

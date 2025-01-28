@@ -7,6 +7,8 @@ import { CreateDeckDialog } from "./create-deck";
 import { PaginatingDecksTable } from "./decks-table";
 import { UpdateDeckDialog } from "./update-deck";
 import { DeleteDeckDialog } from "./delete-deck";
+import { AddTagsCombobox } from "./add-tags";
+import { CreateFlashcardDialog } from "./create-flashcard";
 
 export {
     CreateDeckDialog,
@@ -18,4 +20,6 @@ export {
     PaginatingDecksTable,
     TextEditor,
     UpdateDeckDialog,
+    AddTagsCombobox,
+    CreateFlashcardDialog
 };

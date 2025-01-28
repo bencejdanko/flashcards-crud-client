@@ -3,12 +3,14 @@ import {
     MenubarContent,
     MenubarItem,
     MenubarMenu,
+    MenubarSeparator,
     MenubarTrigger,
-    MenubarSeparator
 } from "@/components/ui/menubar";
 import { Link } from "react-router-dom";
 
 import { ChevronLeft, Menu, Plus, Search, Undo2 } from "lucide-react";
+
+import { CreateFlashcardDialog } from "./create-flashcard";
 
 // @ts-ignore
 import CardsThin from "@/assets/card-icons/flashcards.svg?react";
@@ -18,34 +20,41 @@ import Matching from "@/assets/card-icons/matching.svg?react";
 import MultipleChoice from "@/assets/card-icons/multiple-choice.svg?react";
 // @ts-ignore
 import Input from "@/assets/card-icons/input.svg?react";
+import { Deck } from "@/contexts/pb/types";
 
-export function EditorMenu() {
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { usePocket } from "@/contexts";
+
+export function EditorMenu({ deck }: { deck: Deck }) {
     const questions = [
         {
             title: "flashcard",
             icon: CardsThin,
             disabled: false,
+            dialog: CreateFlashcardDialog,
         },
 
         {
             title: "input",
             icon: Input,
             disabled: false,
+            dialog: CreateFlashcardDialog,
         },
 
         {
             title: "multiple choice",
             icon: MultipleChoice,
             disabled: false,
+            dialog: CreateFlashcardDialog,
         },
 
         {
             title: "matching",
             icon: Matching,
             disabled: true,
+            dialog: CreateFlashcardDialog,
         },
-
-        
     ];
 
     return (
@@ -95,14 +104,22 @@ export function EditorMenu() {
                         </div>
                     </MenubarTrigger>
                     <MenubarContent>
-                        {questions.map((question) => (
-                            <MenubarItem disabled={question.disabled}>
-                                <div className='flex items-center gap-2 text-sm font-thin'>
-                                    <question.icon width={15} height={15} />
-                                    {question.title}
-                                </div>
-                            </MenubarItem>
-                        ))}
+                        <div className='flex flex-col gap-1 w-full'>
+                            {questions.map((question) => (
+                                <question.dialog
+                                    deck={deck}
+                                    key={question.title}
+                                >
+                                    <button className="flex items-center gap-2 text-sm font-thin w-full hover:bg-secondary">
+                                        <question.icon
+                                            width={15}
+                                            height={15}
+                                        />
+                                        {question.title}
+                                    </button>
+                                </question.dialog>
+                            ))}
+                        </div>
                         <MenubarSeparator />
 
                         <MenubarItem>
@@ -112,8 +129,6 @@ export function EditorMenu() {
                         <MenubarItem>
                             File
                         </MenubarItem>
-
-
                     </MenubarContent>
                 </MenubarMenu>
 

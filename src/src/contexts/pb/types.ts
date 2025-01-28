@@ -13,8 +13,8 @@ interface Deck {
 interface Card {
     id: string,
     document: string,
+    type: string,
     deck_id: string,
-    approved: boolean,
     created: string,
     updated: string
 }
@@ -63,7 +63,7 @@ interface PocketContextType {
     
     // Card Functionality
     getCardList: (deckId: string, page: number, limit: number) => Promise<{ error: PocketBaseError | undefined; cards: Card[] | undefined }>,
-    createCard: (deckId: string, document: string) => Promise<{ error: PocketBaseError | undefined; card: Card | undefined }>,
+    createCard: (deckId: string, type: string, document: string) => Promise<{ error: PocketBaseError | undefined; card: Card | undefined }>,
     updateCardDocument: (cardId: string, document: string) => Promise<{ error: PocketBaseError | undefined; card: Card | undefined }>,
     
     // Deck Functionality

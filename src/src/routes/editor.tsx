@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EditorMenu } from "@/components";
 
 import { useEditorTabs } from "@/contexts/editor-tabs";
+import { Deck } from "@/contexts/pb/types";
+import { useParams } from "react-router-dom";
 
 import {
     ResizableHandle,
@@ -20,13 +22,42 @@ import {
     X,
 } from "lucide-react";
 
+import { usePocket } from "@/contexts";
+
 function Editor() {
+
+    const [deckId, setDeckId] = useState<string | undefined>(undefined);
+    const [deck, setDeck] = useState<Deck | undefined>(undefined);
+    const { deck_id } = useParams();
+
     const [selectedTab, setSelectedTab] = useState<string>("1");
     const { openCards, closeCard } = useEditorTabs();
 
+    const { getDeck } = usePocket();
+
+    useEffect(() => {
+        if (!deck_id) {
+            return;
+        }
+
+        async function fetchDeck() {
+            const { deck, error } = await getDeck(deck_id!);
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            setDeck(deck);
+        }
+
+        setDeckId(deck_id);
+        fetchDeck();
+    }, [deck_id]);
+
     return (
         <div className="flex flex-col w-full h-full overflow-auto">
-            <EditorMenu />
+            {deck ? <EditorMenu deck={deck} /> : <p>Error</p>}
             {/* Tab UI */}
             <div className="border-t grow">
                 {/* <TextEditor /> */}

@@ -19,16 +19,15 @@ import { Plus, X } from "lucide-react";
 
 import { Tag } from "@/contexts/pb/types";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-function CreateTagsCombobox() {
+function AddTagsCombobox({ tags, setTags }: { tags: Tag[]; setTags: (tags: Tag[]) => void }) {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [tag, setTag] = useState("");
     const [open, setOpen] = useState(false);
-    const [userTags, setUserTags] = useState<Tag[] | undefined>(undefined);
 
     function handleSetOpen() {
-        if (!userTags) {
+        if (!tags) {
             handleFetchTags();
         }
 
@@ -36,7 +35,7 @@ function CreateTagsCombobox() {
     }
 
     async function handleFetchTags() {
-        setUserTags([]);
+        setTags([]);
     }
 
     return (
@@ -51,7 +50,9 @@ function CreateTagsCombobox() {
                     <div className="flex gap-2 flex-wrap">
                         {selectedTags && selectedTags.length > 0
                             ? selectedTags.map((tag) => (
-                                <button className="bg-primary text-background p-2 rounded text-xs justify-between flex flex-row gap-2">
+                                <button 
+                                    key={tag}
+                                    className="bg-primary text-background p-2 rounded text-xs justify-between flex flex-row gap-2">
                                     {tag}
                                     <button
                                         className="hover:bg-red-500 rounded flex items-center justify-center"
@@ -125,7 +126,7 @@ function CreateTagsCombobox() {
                                 )
                                 : null}
 
-                            {userTags?.map((tag: Tag) => (
+                            {tags?.map((tag: Tag) => (
                                 <CommandItem
                                     key={tag.id}
                                     value={tag.name}
@@ -147,4 +148,4 @@ function CreateTagsCombobox() {
     );
 }
 
-export { CreateTagsCombobox };
+export { AddTagsCombobox };
