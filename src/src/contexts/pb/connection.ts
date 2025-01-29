@@ -12,6 +12,7 @@ function getPocketBase(): { pb?: PocketBase, error?: PocketBaseError | undefined
     if (!pb) {
         try {
             pb = new PocketBase(baseUrl)
+            pb.autoCancellation(false)
             return { pb }
         } catch (error) {
             return { error: error as PocketBaseError }

@@ -14,9 +14,16 @@ import { CreateDeckDialog, PaginatingDecksTable } from "@/components";
 
 import { DashboardMenu } from "@/components";
 
+import { useState } from "react";
+
 function Dashboard() {
+
+    const [filter, setFilter] = useState("last_modified");
+
+    
+
     return (
-        <div className="w-full">
+        <div className="w-full h-full flex flex-col">
             <DashboardMenu />
 
             <div className="m-5">
@@ -42,16 +49,16 @@ function Dashboard() {
 
                 <div className="flex flex-col gap-1">
                     <p className="text-sm text-muted-foreground">Sort by</p>
-                    <Select defaultValue="last">
+                    <Select defaultValue={filter} onValueChange={setFilter}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="last">
+                                <SelectItem value="last_modified">
                                     last modified
                                 </SelectItem>
-                                <SelectItem value="created">
+                                <SelectItem value="last_created">
                                     last created
                                 </SelectItem>
                                 <SelectItem value="alphabetical">
@@ -92,8 +99,8 @@ function Dashboard() {
                 </button>
             </div>
 
-            <div className="m-5">
-                <PaginatingDecksTable limit={5} />
+            <div className="m-5 flex-grow">
+                <PaginatingDecksTable limit={5} filter={filter} />
             </div>
         </div>
     );

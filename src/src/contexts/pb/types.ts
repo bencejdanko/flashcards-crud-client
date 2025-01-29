@@ -1,4 +1,5 @@
 import { AuthModel, RecordModel, RecordAuthResponse } from "pocketbase";
+import PocketBase from "pocketbase";
 
 interface Deck {
     id: string,
@@ -43,11 +44,13 @@ interface CardTag {
 
 interface PocketBaseError {
     code?: number,
-    message?: string
+    message?: string,
+    name?: string,
 }
 
 interface PocketContextType {
 
+    // Connection functionality
     baseUrl: string,
 
     // Auth functionality
@@ -67,7 +70,7 @@ interface PocketContextType {
     updateCardDocument: (cardId: string, document: string) => Promise<{ error: PocketBaseError | undefined; card: Card | undefined }>,
     
     // Deck Functionality
-    getDeckList: (page: number, limit: number) => Promise<{ error: PocketBaseError | undefined; decks: Deck[] | undefined }>,
+    getDeckList: (page: number, limit: number, filter: string) => Promise<{ error: PocketBaseError | undefined; decks: Deck[] | undefined }>,
     getDeck: (deckId: string) => Promise<{ error: PocketBaseError | undefined; deck: Deck | undefined }>,
     createDeck: (name: string, description?: string) => Promise<{ error: PocketBaseError | undefined; deck: Deck | undefined }>,
     deleteDeck: (deckId: string) => Promise<{ error: PocketBaseError | undefined }>,

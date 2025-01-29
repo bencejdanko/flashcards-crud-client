@@ -16,7 +16,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { usePocket } from "@/contexts";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 import {
     Form,
@@ -39,7 +38,6 @@ function DeleteDeckDialog(
 ) {
     const { deleteDeck } = usePocket();
     const { toast } = useToast();
-    const navigate = useNavigate();
 
     const deleteDeckForm = useForm<z.infer<typeof deleteDeckSchema>>({
         resolver: zodResolver(deleteDeckSchema),

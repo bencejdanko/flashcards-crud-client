@@ -2,17 +2,49 @@ import { Deck, PocketBaseError } from "./types";
 
 import { getPocketBase } from "./connection";
 
-async function getDeckList(page: number, limit: number) {
+/**
+ * 
+ * @param page 
+ * @param limit 
+ * @param filter Can 
+ * @returns 
+ */
+async function getDeckList(page: number, limit: number, filter: string) {
     const { pb, error } = getPocketBase();
 
     if (error) {
         return { error: error, decks: undefined };
     }
 
-    const recordsList = await pb!.collection("decks").getList(page, limit);
-    const decks = recordsList.items.map((record) => record as unknown as Deck);
+    let sortField: string
+    switch (filter) {
+        case "last_modified":
+            sortField = "-updated"
+            break;
+        case "last_created":
+            sortField = "-created"
+            break;
+        case "alphabetical":
+            sortField = "name"
+            break;
+        default:
+            sortField = "-created"
+            break;
+    }
 
-    return { error: undefined, decks };
+    try {
+        const recordsList = await pb!.collection("decks").getList(page, limit, {
+            sort: sortField,
+        });
+
+        const decks = recordsList.items.map((record) =>
+            record as unknown as Deck
+        );
+
+        return { error: undefined, decks };
+    } catch (error) {
+        return { error: error as PocketBaseError, decks: undefined };
+    }
 }
 
 async function getDeck(deckId: string) {
@@ -22,9 +54,12 @@ async function getDeck(deckId: string) {
         return { error: error, deck: undefined };
     }
 
-    const deck = await pb!.collection("decks").getOne(deckId) as Deck;
-
-    return { error: undefined, deck };
+    try {
+        const deck = await pb!.collection("decks").getOne(deckId) as Deck;
+        return { error: undefined, deck };
+    } catch (error) {
+        return { error: error as PocketBaseError, deck: undefined };
+    }
 }
 
 async function deleteDeck(deckId: string) {
@@ -79,6 +114,4 @@ async function updateDeck(deckId: string, name: string, description?: string) {
     }
 }
 
-
-
-export { deleteDeck, getDeck, getDeckList, createDeck, updateDeck };
+export { createDeck, deleteDeck, getDeck, getDeckList, updateDeck };

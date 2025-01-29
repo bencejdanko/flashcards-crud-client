@@ -1,4 +1,4 @@
-import { User } from "./types";
+import { User, PocketBaseError } from "./types";
 import { getPocketBase } from "./connection";
 import { baseUrl } from "./connection";
 
@@ -9,9 +9,12 @@ async function getUser(userId: string) {
         return { error: error, user: undefined };
     }
 
-    const user = await pb!.collection("users").getOne(userId) as User;
-
-    return { error: undefined, user };
+    try {
+        const user = await pb!.collection("users").getOne(userId) as User;
+        return { error: undefined, user };
+    } catch (error) {
+        return { error: error as PocketBaseError, user: undefined };
+    }
 }
 
 function toStringUserAvatarUri(user: User) {
