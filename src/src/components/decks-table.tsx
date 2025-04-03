@@ -23,9 +23,9 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { usePocket } from "@/contexts";
 
-import { Deck } from "@/contexts/pb/types";
+import { Deck, PocketBaseError } from "@/contexts/pb/types";
 
-import { AlertCircle, Delete, Edit, Play, RefreshCcw } from "lucide-react";
+import { AlertCircle, Edit, Play, RefreshCcw, Trash } from "lucide-react";
 
 // @ts-ignore
 import Spinner from "@/assets/spinner.svg?react";
@@ -34,8 +34,15 @@ import { Link } from "react-router-dom";
 
 import { UpdateDeckDialog } from "./update-deck";
 import { DeleteDeckDialog } from "./delete-deck";
+import { searchDecks } from "@/contexts/pb/decks";
 
-function PaginatingDecksTable({ limit = 10, filter = '-created' }: { limit?: number, filter?: string }) {
+function PaginatingDecksTable(
+    { limit = 10, filter = "-created", search }: {
+        limit?: number;
+        filter?: string;
+        search?: string;
+    },
+) {
     const [page, setPage] = useState(1);
     const [decks, setDecks] = useState<Deck[]>([]);
     const [loading, setLoading] = useState(false);
@@ -47,7 +54,16 @@ function PaginatingDecksTable({ limit = 10, filter = '-created' }: { limit?: num
     async function fetchDecks() {
         setLoadingError(false);
         setLoading(true);
-        const { decks, error } = await getDeckList(page, limit, filter);
+
+        let decks: Deck[] | undefined;
+        let error: PocketBaseError | undefined;
+
+        if (search) {
+            ({ decks, error } = await searchDecks(limit, search));
+        } else {
+            ({ decks, error } = await getDeckList(page, limit, filter));
+        }
+
         setLoading(false);
 
         if (error) {
@@ -83,7 +99,7 @@ function PaginatingDecksTable({ limit = 10, filter = '-created' }: { limit?: num
 
     useEffect(() => {
         fetchDecks();
-    }, [page, filter]);
+    }, [page, filter, search]);
 
     return (
         loading
@@ -95,11 +111,14 @@ function PaginatingDecksTable({ limit = 10, filter = '-created' }: { limit?: num
             : loadingError
             ? (
                 <div className="flex flex-col justify-center items-center h-full w-full gap-5">
-                    <div className='flex flex-row gap-2 items-center text-red-500'>
+                    <div className="flex flex-row gap-2 items-center text-red-500">
                         <AlertCircle size={20} />
                         There was an error retrieving your decks.
                     </div>
-                    <button className='rounded flex items-center gap-2 text-muted-foreground bg-muted p-2' onClick={fetchDecks}>
+                    <button
+                        className="rounded flex items-center gap-2 text-muted-foreground bg-muted p-2"
+                        onClick={fetchDecks}
+                    >
                         <RefreshCcw size={20} /> Retry
                     </button>
                 </div>
@@ -135,30 +154,39 @@ function PaginatingDecksTable({ limit = 10, filter = '-created' }: { limit?: num
                                             .toLocaleDateString()}
                                     </TableCell>
                                     <TableCell className="flex gap-2 text-muted-foreground">
-                                        <Link
-                                            to={`/editor/${deck.id}`}
-                                            title="Open deck in the editor"
-                                        >
-                                            <Play size={20} />
-                                        </Link>
+                                        <div className="border flex rounded">
+                                            <Link
+                                                to={`/editor/${deck.id}`}
+                                                title="Open deck in the editor"
+                                                className="aspect-square border-r p-2 hover:bg-secondary"
+                                            >
+                                                <Play size={15} />
+                                            </Link>
 
-                                        <UpdateDeckDialog
-                                            deckProp={deck}
-                                            callback={fetchDecks}
-                                        >
-                                            <div title="Edit the deck name and description">
-                                                <Edit size={20} />
-                                            </div>
-                                        </UpdateDeckDialog>
+                                            <UpdateDeckDialog
+                                                deckProp={deck}
+                                                callback={fetchDecks}
+                                            >
+                                                <button
+                                                    title="Edit the deck name and description"
+                                                    className="aspect-square border-r p-2 hover:bg-secondary"
+                                                >
+                                                    <Edit size={15} />
+                                                </button>
+                                            </UpdateDeckDialog>
 
-                                        <DeleteDeckDialog
-                                            deckProp={deck}
-                                            callback={fetchDecks}
-                                        >
-                                            <div title="Delete the deck">
-                                                <Delete size={20} />
-                                            </div>
-                                        </DeleteDeckDialog>
+                                            <DeleteDeckDialog
+                                                deckProp={deck}
+                                                callback={fetchDecks}
+                                            >
+                                                <button
+                                                    title="Delete the deck"
+                                                    className="aspect-square p-2 hover:bg-secondary"
+                                                >
+                                                    <Trash size={15} />
+                                                </button>
+                                            </DeleteDeckDialog>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -178,7 +206,7 @@ function PaginatingDecksTable({ limit = 10, filter = '-created' }: { limit?: num
                                 <div className="flex justify-between w-full">
                                     <Button
                                         onClick={fetchDecks}
-                                        className="absolute"
+                                        className="absolute bg-muted text-muted-foreground"
                                     >
                                         <RefreshCcw size={20} />
                                     </Button>

@@ -23,12 +23,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { usePocket } from "@/contexts";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 import { Deck, Tag } from "@/contexts/pb/types";
 import { Textarea } from "./ui/textarea";
 
 import { AddTagsCombobox } from "./add-tags";
 import { Button } from "./ui/button";
+
+import { TextEditor } from "./text-editor";
 
 const createDeckSchema = z.object({
     document: z.string().min(1, { message: "This field is required." }),
@@ -128,7 +129,7 @@ function CreateFlashcardDialog({
     });
 
     return (
-        <Dialog open={isOpen ?? undefined } onOpenChange={setIsOpen ?? undefined}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger>{children}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px] gap-2">
                 <DialogHeader>
@@ -152,8 +153,7 @@ function CreateFlashcardDialog({
                                         Document
                                     </FormLabel>
                                     <FormControl>
-                                        <Textarea {...field} placeholder={`question: What is the capital of France?
-answer: Paris`} />
+                                        <TextEditor value={``} onChange={()=>{}} />
                                     </FormControl>
 
                                     <FormDescription>
@@ -165,10 +165,13 @@ answer: Paris`} />
                             )}
                         />
                         <AddTagsCombobox tags={tags} setTags={setTags} />
-                        <Button
-                            type="submit"
-                            className="bg-green-500"
-                        >Submit</Button>
+
+                        <div className="flex justify-end mt-4">
+                            <Button
+                                type="submit"
+                                className="bg-green-500"
+                            >Create flashcard</Button>
+                        </div>
                     </form>
                 </Form>
             </DialogContent>

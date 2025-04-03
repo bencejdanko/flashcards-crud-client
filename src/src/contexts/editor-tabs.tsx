@@ -1,7 +1,6 @@
 import {
     createContext,
     useContext,
-    useEffect,
     useState,
 } from "react";
 
@@ -12,7 +11,8 @@ interface EditorTabsType {
     openCard: (cardId: string) => void;
     closeCard: (cardId: string) => void;
     getCurrentTabs: () => string[]; 
-    openCards: string[];
+    openSavedTabs: () => void;
+    openTabs: string[];
 }
 
 export const EditorTabsContext = createContext<EditorTabsType>({} as EditorTabsType);
@@ -21,11 +21,7 @@ export const EditorTabsProvider = ({ children }: { children: React.ReactNode }) 
 
     const { id } = useParams();
 
-    const [openCards, setOpenCards] = useState<string[]>([]);
-
-    useEffect(() => {
-        localStorage.setItem(`openTabs-${id}`, JSON.stringify(["1", "2", "3", "4", "5"]));
-    })
+    const [openTabs, setOpenCards] = useState<string[]>([]);
 
     function getCurrentTabs() {
         const tabs = localStorage.getItem(`openTabs-${id}`);
@@ -35,21 +31,33 @@ export const EditorTabsProvider = ({ children }: { children: React.ReactNode }) 
         return [];
     }
 
+    function openSavedTabs() {
+        const tabs = getCurrentTabs();
+        setOpenCards(tabs);
+    }
+
+
     function openCard(cardId: string) {
-        setOpenCards([...openCards, cardId]);
-        console.log("opening card", cardId);
+        setOpenCards((prevTabs) => {
+            const updatedTabs = [...prevTabs, cardId];
+            localStorage.setItem(`openTabs-${id}`, JSON.stringify(updatedTabs));
+            return updatedTabs;
+        });
     }
 
     function closeCard(cardId: string) {
-        setOpenCards(openCards.filter((id) => id !== cardId));
+        const updatedTabs = openTabs.filter((id) => id !== cardId);
+        setOpenCards(updatedTabs);
+        localStorage.setItem(`openTabs-${id}`, JSON.stringify(updatedTabs));
     }
 
     return (
         <EditorTabsContext.Provider value={{
+            openSavedTabs,
             openCard,
             closeCard,
             getCurrentTabs,
-            openCards,
+            openTabs,
         }}>
             {children}
         </EditorTabsContext.Provider>

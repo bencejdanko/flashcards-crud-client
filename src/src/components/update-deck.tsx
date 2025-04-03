@@ -35,7 +35,13 @@ const deckSchema = z.object({
     description: z.string().optional(),
 });
 
-function UpdateDeckDialog({ children, deckProp, callback }: { children: React.ReactNode, deckProp: Deck, callback?: () => void }) {
+function UpdateDeckDialog(
+    { children, deckProp, callback }: {
+        children: React.ReactNode;
+        deckProp: Deck;
+        callback?: () => void;
+    },
+) {
     const { updateDeck } = usePocket();
     const { toast } = useToast();
 
@@ -48,7 +54,6 @@ function UpdateDeckDialog({ children, deckProp, callback }: { children: React.Re
     });
 
     async function onDeckFormSubmit(values: z.infer<typeof deckSchema>) {
-
         if (!deckProp) {
             return;
         }
@@ -121,7 +126,9 @@ function UpdateDeckDialog({ children, deckProp, callback }: { children: React.Re
                             name="description"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Description (Optional)</FormLabel>
+                                    <FormLabel>
+                                        Description (Optional)
+                                    </FormLabel>
                                     <FormControl>
                                         <Textarea
                                             {...field}
@@ -135,7 +142,11 @@ function UpdateDeckDialog({ children, deckProp, callback }: { children: React.Re
                             )}
                         />
 
-                        <Button className='my-2' type="submit">Save</Button>
+                        <div className="flex justify-end mt-4">
+                            <Button className="bg-green-500" type="submit">
+                                Update
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             </DialogContent>

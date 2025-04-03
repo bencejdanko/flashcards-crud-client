@@ -7,17 +7,6 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Input } from "@/components/ui/input";
-
-import { Button } from "@/components/ui/button";
-
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { usePocket } from "@/contexts";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-
 import {
     Form,
     FormControl,
@@ -28,56 +17,69 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 
-import { Deck } from "@/contexts/pb/types";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
-const deleteDeckSchema = z.object({
-    name: z.string().min(1, { message: "This field is required." }),
+import { usePocket } from "@/contexts";
+import { useToast } from "@/hooks/use-toast";
+
+import { Card } from "@/contexts/pb/types";
+import { toast } from "sonner";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "./ui/button";
+
+const deleteCardSchema = z.object({
+    confirmDelete: z.string().min(1, { message: "This field is required." }),
 });
 
-function DeleteDeckDialog(
-    { children, deckProp, callback }: {
+function DeleteCardDialog(
+    {
+        children,
+        cardProp,
+        callback,
+    }: {
         children: React.ReactNode;
-        deckProp: Deck;
+        cardProp: Card;
         callback: () => void;
     },
 ) {
-    const { deleteDeck } = usePocket();
+    const { deleteCard } = usePocket();
     const { toast } = useToast();
 
-    const deleteDeckForm = useForm<z.infer<typeof deleteDeckSchema>>({
-        resolver: zodResolver(deleteDeckSchema),
+    const deleteCardForm = useForm<z.infer<typeof deleteCardSchema>>({
+        resolver: zodResolver(deleteCardSchema),
         defaultValues: {
-            name: "",
+            confirmDelete: "",
         },
     });
 
-    async function onDeleteDeckFormSubmit(
-        values: z.infer<typeof deleteDeckSchema>,
+    async function onDeleteCardFormSubmit(
+        values: z.infer<typeof deleteCardSchema>,
     ) {
-        if (values.name !== deckProp.name) {
-            deleteDeckForm.setError("name", {
-                message: "The deck name does not match.",
+        if (values.confirmDelete !== "DELETE") {
+            deleteCardForm.setError("confirmDelete", {
+                message: "Please type DELETE to confirm.",
             });
             return;
         }
 
-        const { error } = await deleteDeck(
-            deckProp.id,
-        );
+        const { error } = await deleteCard(cardProp.id);
 
         if (error) {
             toast({
                 variant: "destructive",
-                title: "Failed to delete deck!",
-                description: "Something went wrong while deleting the deck.",
+                title: "Error",
+                description: error.message,
             });
             return;
         }
 
         toast({
             variant: "success",
-            title: "Deck deleted!",
-            description: "You've successfully deleted " + deckProp.name + ".",
+            title: "Card deleted!",
+            description: "The card has been successfully deleted.",
         });
 
         callback();
@@ -93,23 +95,23 @@ function DeleteDeckDialog(
                         Are you sure you want to delete this deck?
                     </DialogDescription>
                 </DialogHeader>
-                <Form {...deleteDeckForm}>
+                <Form {...deleteCardForm}>
                     <form
-                        onSubmit={deleteDeckForm.handleSubmit(
-                            onDeleteDeckFormSubmit,
+                        onSubmit={deleteCardForm.handleSubmit(
+                            onDeleteCardFormSubmit,
                         )}
                     >
                         <FormField
-                            control={deleteDeckForm.control}
-                            name="name"
+                            control={deleteCardForm.control}
+                            name="confirmDelete"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel
-                                        htmlFor="name"
+                                        htmlFor="confirmDelete"
                                         className="text-destructive"
                                     >
-                                        To delete the deck, retype the name of
-                                        the deck, <br />"{deckProp.name}"
+                                        To delete the deck, type DELETE in the
+                                        input.
                                     </FormLabel>
                                     <FormControl>
                                         <Input
@@ -124,11 +126,11 @@ function DeleteDeckDialog(
                                 </FormItem>
                             )}
                         />
-                        <div className='flex justify-end mt-4'>
+                        <div className="flex justify-end mt-4">
                             <Button
                                 className="bg-destructive"
                                 type="submit"
-                                disabled={!deleteDeckForm.formState.isValid}
+                                disabled={!deleteCardForm.formState.isValid}
                             >
                                 Delete
                             </Button>
@@ -140,4 +142,4 @@ function DeleteDeckDialog(
     );
 }
 
-export { DeleteDeckDialog };
+export { DeleteCardDialog };

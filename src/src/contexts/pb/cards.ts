@@ -24,6 +24,21 @@ async function getCardList(deckId: string, page: number, limit: number) {
     }
 }
 
+async function getCard(cardId: string) {
+    const { pb, error } = getPocketBase();
+
+    if (error) {
+        return { error: error, card: undefined };
+    }
+
+    try {
+        const card = await pb!.collection("cards").getOne(cardId) as Card;
+        return { error: undefined, card };
+    } catch (error) {
+        return { error: error as PocketBaseError, card: undefined };
+    }
+}
+
 async function createCard(deckId: string, type: string, document: string) {
     const { pb, error } = getPocketBase();
 
@@ -60,4 +75,19 @@ async function updateCardDocument(cardId: string, document: string) {
     }
 }
 
-export { createCard, getCardList, updateCardDocument };
+async function deleteCard(cardId: string) {
+    const { pb, error } = getPocketBase();
+
+    if (error) {
+        return { error: error };
+    }
+
+    try {
+        await pb!.collection("cards").delete(cardId);
+        return { error: undefined };
+    } catch (error) {
+        return { error: error as PocketBaseError };
+    }
+}
+
+export { getCard, createCard, getCardList, updateCardDocument, deleteCard };

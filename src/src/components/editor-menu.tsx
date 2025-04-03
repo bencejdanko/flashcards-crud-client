@@ -12,50 +12,38 @@ import { ChevronLeft, Menu, Plus, Search, Undo2 } from "lucide-react";
 
 import { CreateFlashcardDialog } from "./create-flashcard";
 
-// @ts-ignore
-import CardsThin from "@/assets/card-icons/flashcards.svg?react";
-// @ts-ignore
-import Matching from "@/assets/card-icons/matching.svg?react";
-// @ts-ignore
-import MultipleChoice from "@/assets/card-icons/multiple-choice.svg?react";
-// @ts-ignore
-import Input from "@/assets/card-icons/input.svg?react";
-import { Deck } from "@/contexts/pb/types";
-
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+
+import { Deck, Question } from "@/contexts/pb/types";
 import { usePocket } from "@/contexts";
 
-export function EditorMenu({ deck }: { deck: Deck }) {
-    const questions = [
-        {
-            title: "flashcard",
-            icon: CardsThin,
-            disabled: false,
-            dialog: CreateFlashcardDialog,
-        },
+export function EditorMenu(
+    { deck, createCardCallback }: {
+        deck: Deck;
+        createCardCallback: () => void;
+    },
+) {
+    const { questions } = usePocket();
 
-        {
-            title: "input",
-            icon: Input,
-            disabled: false,
-            dialog: CreateFlashcardDialog,
-        },
+    const [activeDialog, setActiveDialog] = useState<any | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-        {
-            title: "multiple choice",
-            icon: MultipleChoice,
-            disabled: false,
-            dialog: CreateFlashcardDialog,
-        },
+    const handleOpenDialog = (question: Question) => {
+        switch (question.type) {
+            case "Flashcard":
+                setActiveDialog({ component: CreateFlashcardDialog });
+                setIsDialogOpen(true);
+                break;
+            default:
+                setActiveDialog({ component: CreateFlashcardDialog });
+                setIsDialogOpen(true);
+        }
+    };
 
-        {
-            title: "matching",
-            icon: Matching,
-            disabled: true,
-            dialog: CreateFlashcardDialog,
-        },
-    ];
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+        setActiveDialog(null);
+    };
 
     return (
         <Menubar className="rounded-none shadow-none border-none m-2 flex justify-between h-8 ">
@@ -104,26 +92,30 @@ export function EditorMenu({ deck }: { deck: Deck }) {
                         </div>
                     </MenubarTrigger>
                     <MenubarContent>
-                        <div className='flex flex-col gap-1 w-full'>
-                            {questions.map((question) => (
-                                <question.dialog
-                                    deck={deck}
-                                    key={question.title}
-                                >
-                                    <button className="flex items-center gap-2 text-sm font-thin w-full hover:bg-secondary">
-                                        <question.icon
-                                            width={15}
-                                            height={15}
-                                        />
-                                        {question.title}
-                                    </button>
-                                </question.dialog>
-                            ))}
+                        <div className="flex flex-col gap-1 w-full">
+                            {questions?.map((question) => {
+                                return (
+                                    <MenubarItem
+                                        key={question.type}
+                                        onClick={() => {
+                                            handleOpenDialog(question);
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2 text-sm font-thin w-full hover:bg-secondary">
+                                            <question.icon
+                                                width={15}
+                                                height={15}
+                                            />
+                                            {question.type}
+                                        </div>
+                                    </MenubarItem>
+                                );
+                            })}
                         </div>
                         <MenubarSeparator />
 
                         <MenubarItem>
-                            Question
+                            Create with AI
                         </MenubarItem>
 
                         <MenubarItem>
@@ -143,6 +135,20 @@ export function EditorMenu({ deck }: { deck: Deck }) {
                     </MenubarTrigger>
                 </MenubarMenu>
             </div>
+
+            {isDialogOpen && activeDialog && (
+                <activeDialog.component
+                    isOpen={isDialogOpen}
+                    setIsOpen={setIsDialogOpen}
+                    deck={deck}
+                    key={activeDialog.title}
+                    callback={() => {
+                        createCardCallback();
+                        handleCloseDialog();
+                    }}
+                >
+                </activeDialog.component>
+            )}
         </Menubar>
     );
 }

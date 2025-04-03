@@ -28,7 +28,6 @@ import { useEffect, useState } from "react";
 
 import { InfoCircledIcon, InputIcon } from "@radix-ui/react-icons";
 
-
 import {
     Tooltip,
     TooltipContent,
@@ -39,6 +38,7 @@ import { useParams } from "react-router-dom";
 import { usePocket } from "@/contexts";
 
 import { Deck } from "@/contexts/pb/types";
+import { Calendar } from "./ui/calendar";
 
 export function EditorSidebar() {
     const [deckId, setDeckId] = useState<string | undefined>(undefined);
@@ -46,7 +46,7 @@ export function EditorSidebar() {
     const { deck_id } = useParams();
     const { getDeck } = usePocket();
 
-    const cards = []
+    const cards = [];
 
     useEffect(() => {
         if (!deck_id) {
@@ -71,6 +71,7 @@ export function EditorSidebar() {
     return (
         <div>
             <Sidebar collapsible="icon" className="pb-5">
+                <Calendar />
                 <SidebarContent>
                     <SidebarGroup>
                         {/* <SidebarGroupLabel>Add a card</SidebarGroupLabel> */}
@@ -81,107 +82,6 @@ export function EditorSidebar() {
                                         {deck?.name}
                                     </p>
                                 </SidebarMenuItem>
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-
-                        <SidebarGroupLabel>Cards</SidebarGroupLabel>
-                        <SidebarGroupContent className="bg-white rounded border">
-                            <SidebarMenu>
-                                {cards.length > 0
-                                    ? cards.map((card) => {
-                                        const unknownType =
-                                            "Unknown: Unable to process card type.";
-
-                                        if (!card.approved) {
-                                            return null;
-                                        }
-                                        let question = null;
-                                        let type: string | null = null;
-                                        let QuestionIcon = AlertCircle; // Default icon
-
-                                        try {
-                                            const parsed = YAML.parse(
-                                                card.document,
-                                                card.type,
-                                            );
-                                            question = parsed.question || null;
-                                            type = parsed.type || null;
-
-                                            console.log(parsed);
-
-                                            const matchedQuestion = questions
-                                                .find(
-                                                    (q) => q.title === type,
-                                                );
-
-                                            console.log(
-                                                "Matched question",
-                                                matchedQuestion,
-                                            );
-
-                                            if (matchedQuestion) {
-                                                QuestionIcon =
-                                                    matchedQuestion.icon;
-                                            } else {
-                                                type = unknownType;
-                                            }
-                                        } catch (error) {
-                                            // Ignore errors and keep question as "null"
-                                        }
-
-                                        return (
-                                            <SidebarMenuItem key={card.id}>
-                                                <SidebarMenuButton
-                                                    className="flex justify-between"
-                                                    onClick={() => {}}
-                                                >
-                                                    <div className="flex items-center gap-3 justify-between w-full">
-                                                        <span className="truncate flex items-center gap-2 mr-3 ">
-                                                            <TooltipProvider
-                                                                delayDuration={100}
-                                                            >
-                                                                <Tooltip>
-                                                                    <TooltipTrigger
-                                                                        asChild
-                                                                    >
-                                                                        <QuestionIcon
-                                                                            width={20}
-                                                                            className={`flex-shrink-0 ${
-                                                                                type ===
-                                                                                        unknownType
-                                                                                    ? "text-red-500"
-                                                                                    : ""
-                                                                            }`}
-                                                                        />
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        {type}
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                            </TooltipProvider>
-
-                                                            {question}
-                                                        </span>
-                                                        <Trash
-                                                            width={15}
-                                                            className="ml-auto flex-shrink-0"
-                                                        />
-                                                    </div>
-                                                </SidebarMenuButton>
-                                            </SidebarMenuItem>
-                                        );
-                                    })
-                                    : (
-                                        <div className='h-60 flex justify-center items-center'>
-                                            No cards found.
-                                        </div>
-                                    )}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-
-                        <SidebarGroupLabel>Files</SidebarGroupLabel>
-                        <SidebarGroupContent className="bg-white rounded border">
-                            <SidebarMenu>
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>

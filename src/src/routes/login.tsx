@@ -155,10 +155,16 @@ export const Login = () => {
                                                 </FormItem>
                                             )}
                                         />
-
-                                        <Button className='my-2 bg-green-500' type="submit" disabled={!loginForm.formState.isValid}>
-                                            Submit
-                                        </Button>
+                                        <div className="flex justify-end">
+                                            <Button
+                                                className="my-2 bg-green-500"
+                                                type="submit"
+                                                disabled={!loginForm.formState
+                                                    .isValid}
+                                            >
+                                                Login
+                                            </Button>
+                                        </div>
                                     </form>
                                 </Form>
                             </CardContent>

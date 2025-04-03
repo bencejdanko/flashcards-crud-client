@@ -1,5 +1,4 @@
 import { AuthModel, RecordModel, RecordAuthResponse } from "pocketbase";
-import PocketBase from "pocketbase";
 
 interface Deck {
     id: string,
@@ -48,10 +47,27 @@ interface PocketBaseError {
     name?: string,
 }
 
+enum QuestionType {
+    Flashcard = "flashcard",
+    Input = "input",
+    MultipleChoice = "multiple",
+    Matching = "matching",
+}
+
+interface Question {
+    type: string,
+    icon: any,
+    info: string,
+    disabled: boolean,
+}
+
 interface PocketContextType {
 
     // Connection functionality
     baseUrl: string,
+
+    // Question Flavours
+    questions: Question[],
 
     // Auth functionality
     authWithPassword: (email: string, password: string) => Promise<{ record: RecordAuthResponse<RecordModel> | undefined; error: PocketBaseError | undefined }>,
@@ -68,13 +84,16 @@ interface PocketContextType {
     getCardList: (deckId: string, page: number, limit: number) => Promise<{ error: PocketBaseError | undefined; cards: Card[] | undefined }>,
     createCard: (deckId: string, type: string, document: string) => Promise<{ error: PocketBaseError | undefined; card: Card | undefined }>,
     updateCardDocument: (cardId: string, document: string) => Promise<{ error: PocketBaseError | undefined; card: Card | undefined }>,
-    
+    deleteCard: (cardId: string) => Promise<{ error: PocketBaseError | undefined }>,
+    getCard: (cardId: string) => Promise<{ error: PocketBaseError | undefined; card: Card | undefined }>,
+
     // Deck Functionality
     getDeckList: (page: number, limit: number, filter: string) => Promise<{ error: PocketBaseError | undefined; decks: Deck[] | undefined }>,
     getDeck: (deckId: string) => Promise<{ error: PocketBaseError | undefined; deck: Deck | undefined }>,
     createDeck: (name: string, description?: string) => Promise<{ error: PocketBaseError | undefined; deck: Deck | undefined }>,
     deleteDeck: (deckId: string) => Promise<{ error: PocketBaseError | undefined }>,
     updateDeck: (deckId: string, name: string, description?: string) => Promise<{ error: PocketBaseError | undefined; deck: Deck | undefined }>,
+    searchDecks: (limit: number, search: string) => Promise<{ error: PocketBaseError | undefined; decks: Deck[] | undefined }>,
 
     // Tag Functionality
     createTag: (name: string) => Promise<{ error: PocketBaseError | undefined; tag: Tag | undefined }>,
@@ -86,4 +105,5 @@ interface PocketContextType {
 
 }
 
-export type { PocketContextType, PocketBaseError, Deck, Card, User, Tag, CardTag }
+export type { PocketContextType, PocketBaseError, Deck, Card, User, Tag, CardTag, Question }
+export { QuestionType }

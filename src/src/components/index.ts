@@ -9,6 +9,7 @@ import { UpdateDeckDialog } from "./update-deck";
 import { DeleteDeckDialog } from "./delete-deck";
 import { AddTagsCombobox } from "./add-tags";
 import { CreateFlashcardDialog } from "./create-flashcard";
+import { DeleteCardDialog } from "./delete-card";
 
 export {
     CreateDeckDialog,
@@ -21,5 +22,6 @@ export {
     TextEditor,
     UpdateDeckDialog,
     AddTagsCombobox,
-    CreateFlashcardDialog
+    CreateFlashcardDialog,
+    DeleteCardDialog,
 };

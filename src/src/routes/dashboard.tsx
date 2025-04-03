@@ -7,9 +7,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { Plus, Bot } from "lucide-react";
+import { Bot, Plus, Search } from "lucide-react";
 
-import { Search } from "lucide-react";
 import { CreateDeckDialog, PaginatingDecksTable } from "@/components";
 
 import { DashboardMenu } from "@/components";
@@ -17,10 +16,8 @@ import { DashboardMenu } from "@/components";
 import { useState } from "react";
 
 function Dashboard() {
-
     const [filter, setFilter] = useState("last_modified");
-
-    
+    const [search, setSearch] = useState("");
 
     return (
         <div className="w-full h-full flex flex-col">
@@ -33,9 +30,9 @@ function Dashboard() {
 
                 <p className="text-muted-foreground">Decks</p>
             </div>
-            <div className="flex">
+            <div className="flex gap-5 ml-5">
                 <div
-                    className="w-[300px] m-5 flex gap-5 bg-secondary rounded p-3 text-muted-foreground text-sm items-center focus-within:ring-2 focus-within:blue-500"
+                    className="w-[300px] flex gap-5 bg-secondary rounded p-3 text-muted-foreground text-sm items-center focus-within:ring-2 focus-within:blue-500"
                     onClick={() =>
                         document.getElementById("search-input")?.focus()}
                 >
@@ -44,6 +41,7 @@ function Dashboard() {
                         id="search-input"
                         className="bg-transparent border-none focus:outline-none text-muted-foreground"
                         placeholder="Search in decks"
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
 
@@ -74,7 +72,7 @@ function Dashboard() {
                 <CreateDeckDialog>
                     <button className="border border-primary rounded p-5 hover:border-blue-500 hover:bg-secondary">
                         <div className="flex items-center text-left gap-10 w-[300px] h-[60px]">
-                            <Plus size={25}/>
+                            <Plus size={25} />
                             <div>
                                 <p>Empty deck</p>
                                 <p className="text-sm text-muted-foreground">
@@ -100,7 +98,11 @@ function Dashboard() {
             </div>
 
             <div className="m-5 flex-grow">
-                <PaginatingDecksTable limit={5} filter={filter} />
+                <PaginatingDecksTable
+                    limit={5}
+                    filter={filter}
+                    search={search.length > 0 ? search : undefined}
+                />
             </div>
         </div>
     );

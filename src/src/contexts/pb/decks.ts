@@ -114,4 +114,29 @@ async function updateDeck(deckId: string, name: string, description?: string) {
     }
 }
 
-export { createDeck, deleteDeck, getDeck, getDeckList, updateDeck };
+async function searchDecks(limit: number, search: string) {
+    const { pb, error } = getPocketBase();
+
+    if (error) {
+        return { error: error, decks: undefined };
+    }
+
+    try {
+        const recordsList = await pb!.collection("decks").getList(1, limit, {
+            filter: pb!.filter(
+                "name ~ {:search} || description ~ {:search}",
+                { search }
+            )
+        });
+
+        const decks = recordsList.items.map((record) =>
+            record as unknown as Deck
+        );
+
+        return { error: undefined, decks };
+    } catch (error) {
+        return { error: error as PocketBaseError, decks: undefined };
+    }
+}
+
+export { createDeck, deleteDeck, getDeck, getDeckList, updateDeck, searchDecks };

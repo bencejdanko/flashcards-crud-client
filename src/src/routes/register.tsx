@@ -146,7 +146,9 @@ export const Register = () => {
                                             name="name"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Display Name</FormLabel>
+                                                    <FormLabel>
+                                                        Display Name
+                                                    </FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             type="text"
@@ -155,7 +157,9 @@ export const Register = () => {
                                                         />
                                                     </FormControl>
                                                     <FormDescription>
-                                                        This is how others will see your name. You can change this later.
+                                                        This is how others will
+                                                        see your name. You can
+                                                        change this later.
                                                     </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
@@ -209,10 +213,16 @@ export const Register = () => {
                                                 </FormItem>
                                             )}
                                         />
-
-                                        <Button className='my-2 bg-green-500' type="submit" disabled={!registerForm.formState.isValid}>
-                                            Register
-                                        </Button>
+                                        <div className='flex justify-end'>
+                                            <Button
+                                                className="my-2 bg-green-500"
+                                                type="submit"
+                                                disabled={!registerForm
+                                                    .formState.isValid}
+                                            >
+                                                Register
+                                            </Button>
+                                        </div>
                                     </form>
                                 </Form>
                             </CardContent>
